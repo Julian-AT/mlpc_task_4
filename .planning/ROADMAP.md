@@ -12,7 +12,7 @@ The project moves from a reproducible data foundation to classifier experiments,
 - Decimal phases (2.1, 2.2): Urgent insertions, marked with INSERTED
 
 - [ ] **Phase 1: Project Scaffold and Data Foundation** - Set up the repo structure, load the dataset, aggregate labels, and create the dataset cache. (implemented 2026-05-27; verification blocked by missing local dataset)
-- [ ] **Phase 2: Splits, Preprocessing, Metrics, and Baseline** - Establish leakage-safe evaluation inputs and baseline performance.
+- [ ] **Phase 2: Splits, Preprocessing, Metrics, and Baseline** - Establish leakage-safe evaluation inputs and baseline performance. (implemented 2026-05-27; real artifacts blocked by missing dataset cache)
 - [ ] **Phase 3: Logistic Regression Sweep** - Train, tune, save, and visualize the linear model family.
 - [ ] **Phase 4: MLX MLP Sweep** - Train, tune, save, and visualize the nonlinear temporal-context model family.
 - [ ] **Phase 5: Final Evaluation and Case Study** - Compare final models on test data and generate qualitative case-study evidence.
@@ -181,7 +181,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Project Scaffold and Data Foundation | 3/3 | Blocked on local dataset | - |
-| 2. Splits, Preprocessing, Metrics, and Baseline | 0/3 | Not started | - |
+| 2. Splits, Preprocessing, Metrics, and Baseline | 3/3 | Implemented; blocked on dataset cache | - |
 | 3. Logistic Regression Sweep | 0/2 | Not started | - |
 | 4. MLX MLP Sweep | 0/3 | Not started | - |
 | 5. Final Evaluation and Case Study | 0/3 | Not started | - |

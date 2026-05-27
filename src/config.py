@@ -10,6 +10,12 @@ ANNOTATIONS_CSV = DATA_DIR / "annotations.csv"
 RESULTS_DIR = ROOT / "results"
 FIG_DIR = RESULTS_DIR / "figures"
 DATASET_CACHE = RESULTS_DIR / "dataset_cache.npz"
+SPLITS_PATH = RESULTS_DIR / "splits.npz"
+CLASS_DISTRIBUTION_CSV = RESULTS_DIR / "class_distribution.csv"
+PREPROCESSED_CACHE = RESULTS_DIR / "preprocessed.npz"
+SCALER_PATH = RESULTS_DIR / "scaler.joblib"
+PER_FILE_IOU_PATH = RESULTS_DIR / "per_file_iou.npz"
+BASELINE_JSON = RESULTS_DIR / "baseline.json"
 RESULTS_LOG = RESULTS_DIR / "log.md"
 
 # Seeds and splits

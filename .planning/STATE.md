@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-27T15:27:38Z"
-last_activity: 2026-05-27 -- Phase 01 verification found local dataset blocker
+last_updated: "2026-05-27T16:25:00Z"
+last_activity: 2026-05-27 -- Phase 02 implemented with synthetic tests; real artifacts blocked by dataset cache
 progress:
   total_phases: 7
   completed_phases: 0
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 6
+  completed_plans: 6
   percent: 0
 ---
 
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 
 ## Current Position
 
-Phase: 01 (Project Scaffold and Data Foundation) — VERIFICATION GAPS
+Phase: 02 (Splits, Preprocessing, Metrics, and Baseline) — VERIFICATION GAPS
 Plan: 3 of 3 implemented
-Status: Blocked on local dataset for real cache smoke
-Last activity: 2026-05-27 -- Phase 01 verification found local dataset blocker
+Status: Real artifact generation blocked on missing `results/dataset_cache.npz`
+Last activity: 2026-05-27 -- Phase 02 implemented with synthetic tests; real artifacts blocked by dataset cache
 
 Progress: [######----] implementation complete, verification blocked
 
@@ -47,8 +47,8 @@ Progress: [######----] implementation complete, verification blocked
 
 **Recent Trend:**
 
-- Last 5 plans: 01-01, 01-02, 01-03
-- Trend: blocked on local dataset verification
+- Last 5 plans: 01-02, 01-03, 02-01, 02-02, 02-03
+- Trend: code paths moving forward; real runs blocked on local dataset verification
 
 *Updated after each plan completion*
 
@@ -70,6 +70,7 @@ None yet.
 ### Blockers/Concerns
 
 - Phase 1 verification is blocked until `data/metadata.csv`, `data/annotations.csv`, and `data/audio_features/*.npz` are available locally and `python -m src.data` writes `results/dataset_cache.npz`.
+- Phase 2 real artifacts are blocked until `results/dataset_cache.npz` exists; synthetic tests verify code behavior.
 - Task 3 code/report and LaTeX templates should be added if available.
 - Deadline is May 28, 2026, 23:59; optional experiments must be cut if they threaten report/slides.
 
@@ -81,6 +82,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-27T15:27:38Z
-Stopped at: Phase 1 implemented; verification gaps documented
-Resume file: .planning/phases/01-project-scaffold-and-data-foundation/01-VERIFICATION.md
+Last session: 2026-05-27T16:25:00Z
+Stopped at: Phase 2 implemented; verification gaps documented
+Resume file: .planning/phases/02-splits-preprocessing-metrics-and-baseline/02-VERIFICATION.md

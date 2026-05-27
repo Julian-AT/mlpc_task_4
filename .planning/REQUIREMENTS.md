@@ -103,16 +103,16 @@ No v2 scope is planned. Future challenge-task work should be tracked separately 
 | DATA-04 | Phase 1 | Complete |
 | DATA-05 | Phase 1 | Blocked: local dataset required |
 | DATA-06 | Phase 1 | Blocked: local dataset required |
-| SPLIT-01 | Phase 2 | Pending |
-| SPLIT-02 | Phase 2 | Pending |
-| SPLIT-03 | Phase 2 | Pending |
-| PREP-01 | Phase 2 | Pending |
-| PREP-02 | Phase 2 | Pending |
-| PREP-03 | Phase 2 | Pending |
-| EVAL-01 | Phase 2 | Pending |
-| EVAL-02 | Phase 2 | Pending |
-| EVAL-03 | Phase 2 | Pending |
-| EVAL-04 | Phase 2 | Pending |
+| SPLIT-01 | Phase 2 | Implemented; real run blocked by DATA-05 |
+| SPLIT-02 | Phase 2 | Implemented; real run blocked by DATA-05 |
+| SPLIT-03 | Phase 2 | Implemented; real outputs blocked by DATA-05 |
+| PREP-01 | Phase 2 | Implemented; real output blocked by DATA-05 |
+| PREP-02 | Phase 2 | Implemented; real output blocked by DATA-05 |
+| PREP-03 | Phase 2 | Implemented helper; real use blocked by DATA-05 |
+| EVAL-01 | Phase 2 | Implemented |
+| EVAL-02 | Phase 2 | Implemented; real output blocked by DATA-05 |
+| EVAL-03 | Phase 2 | Implemented; real output blocked by DATA-05 |
+| EVAL-04 | Phase 2 | Deferred to report prose |
 | LR-01 | Phase 3 | Pending |
 | LR-02 | Phase 3 | Pending |
 | LR-03 | Phase 3 | Pending |

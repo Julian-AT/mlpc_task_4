@@ -7,19 +7,19 @@
 
 ### Setup
 
-- [ ] **SETUP-01**: Repository contains the planned project structure (`src/`, `results/`, `report/`, `slides/`, and support files) without committing course dataset files or generated large artifacts.
-- [ ] **SETUP-02**: Python environment dependencies are documented in `requirements.txt` and cover NumPy, pandas, scikit-learn, matplotlib, seaborn, tqdm, MLX, librosa/soundfile, pyarrow if used, and joblib if used.
-- [ ] **SETUP-03**: `src/config.py` defines paths, seeds, split fractions, label thresholds, class names, and hyperparameter grids in one place.
-- [ ] **SETUP-04**: `results/log.md` records one-line verification notes after each implementation phase.
+- [x] **SETUP-01**: Repository contains the planned project structure (`src/`, `results/`, `report/`, `slides/`, and support files) without committing course dataset files or generated large artifacts.
+- [x] **SETUP-02**: Python environment dependencies are documented in `requirements.txt` and cover NumPy, pandas, scikit-learn, matplotlib, seaborn, tqdm, MLX, librosa/soundfile, pyarrow if used, and joblib if used.
+- [x] **SETUP-03**: `src/config.py` defines paths, seeds, split fractions, label thresholds, class names, and hyperparameter grids in one place.
+- [x] **SETUP-04**: `results/log.md` records one-line verification notes after each implementation phase.
 
 ### Data Preparation
 
-- [ ] **DATA-01**: Dataset loader reads `metadata.csv`, `annotations.csv`, and all `audio_features/*.npz` files from a configurable data path or symlink.
-- [ ] **DATA-02**: Feature concatenation combines all available base feature aggregations consistently and records the final feature dimensionality.
-- [ ] **DATA-03**: Label aggregation converts each `.npz` `annotations` array from `[T, C, A]` overlap values to `[T, C]` binary labels using 0.5 binarization and majority voting over valid annotators.
-- [ ] **DATA-04**: Label aggregation correctly handles single-annotator files and masks annotators that did not annotate a file instead of counting them as negative votes.
-- [ ] **DATA-05**: Dataset cache stores features, labels, file IDs, collector IDs, segment indices, start times, end times, and class names under `results/dataset_cache.npz`.
-- [ ] **DATA-06**: Data preparation sanity checks print or log segment count, class names/order, positive rates, and feature dimensionality.
+- [x] **DATA-01**: Dataset loader reads `metadata.csv`, `annotations.csv`, and all `audio_features/*.npz` files from a configurable data path or symlink.
+- [x] **DATA-02**: Feature concatenation combines all available base feature aggregations consistently and records the final feature dimensionality.
+- [x] **DATA-03**: Label aggregation converts each `.npz` `annotations` array from `[T, C, A]` overlap values to `[T, C]` binary labels using 0.5 binarization and majority voting over valid annotators.
+- [x] **DATA-04**: Label aggregation correctly handles single-annotator files and masks annotators that did not annotate a file instead of counting them as negative votes.
+- [x] **DATA-05**: Dataset cache stores features, labels, file IDs, collector IDs, segment indices, start times, end times, and class names under `results/dataset_cache.npz`.
+- [x] **DATA-06**: Data preparation sanity checks print or log segment count, class names/order, positive rates, and feature dimensionality.
 
 ### Splits and Preprocessing
 
@@ -93,16 +93,16 @@ No v2 scope is planned. Future challenge-task work should be tracked separately 
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SETUP-01 | Phase 1 | Pending |
-| SETUP-02 | Phase 1 | Pending |
-| SETUP-03 | Phase 1 | Pending |
-| SETUP-04 | Phase 1 | Pending |
-| DATA-01 | Phase 1 | Pending |
-| DATA-02 | Phase 1 | Pending |
-| DATA-03 | Phase 1 | Pending |
-| DATA-04 | Phase 1 | Pending |
-| DATA-05 | Phase 1 | Pending |
-| DATA-06 | Phase 1 | Pending |
+| SETUP-01 | Phase 1 | Complete |
+| SETUP-02 | Phase 1 | Complete |
+| SETUP-03 | Phase 1 | Complete |
+| SETUP-04 | Phase 1 | Complete |
+| DATA-01 | Phase 1 | Complete |
+| DATA-02 | Phase 1 | Complete |
+| DATA-03 | Phase 1 | Complete |
+| DATA-04 | Phase 1 | Complete |
+| DATA-05 | Phase 1 | Complete |
+| DATA-06 | Phase 1 | Complete |
 | SPLIT-01 | Phase 2 | Pending |
 | SPLIT-02 | Phase 2 | Pending |
 | SPLIT-03 | Phase 2 | Pending |

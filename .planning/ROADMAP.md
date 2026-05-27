@@ -11,7 +11,7 @@ The project moves from a reproducible data foundation to classifier experiments,
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions, marked with INSERTED
 
-- [ ] **Phase 1: Project Scaffold and Data Foundation** - Set up the repo structure, load the dataset, aggregate labels, and create the dataset cache.
+- [x] **Phase 1: Project Scaffold and Data Foundation** - Set up the repo structure, load the dataset, aggregate labels, and create the dataset cache. (completed 2026-05-27)
 - [ ] **Phase 2: Splits, Preprocessing, Metrics, and Baseline** - Establish leakage-safe evaluation inputs and baseline performance.
 - [ ] **Phase 3: Logistic Regression Sweep** - Train, tune, save, and visualize the linear model family.
 - [ ] **Phase 4: MLX MLP Sweep** - Train, tune, save, and visualize the nonlinear temporal-context model family.
@@ -38,15 +38,15 @@ The project moves from a reproducible data foundation to classifier experiments,
 Plans:
 **Wave 1**
 
-- [ ] 01-01: Scaffold repository, dependencies, config, gitignore, and results log.
+- [x] 01-01: Scaffold repository, dependencies, config, gitignore, and results log.
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-02: Implement metadata/feature loading and feature concatenation.
+- [x] 01-02: Implement metadata/feature loading and feature concatenation.
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 01-03: Implement label aggregation, dataset cache, and sanity checks.
+- [x] 01-03: Implement label aggregation, dataset cache, and sanity checks.
 
 ### Phase 2: Splits, Preprocessing, Metrics, and Baseline
 
@@ -180,7 +180,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Project Scaffold and Data Foundation | 0/3 | Not started | - |
+| 1. Project Scaffold and Data Foundation | 3/3 | Complete   | 2026-05-27 |
 | 2. Splits, Preprocessing, Metrics, and Baseline | 0/3 | Not started | - |
 | 3. Logistic Regression Sweep | 0/2 | Not started | - |
 | 4. MLX MLP Sweep | 0/3 | Not started | - |

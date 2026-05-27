@@ -130,7 +130,7 @@ def _metadata_lookup(metadata: pd.DataFrame) -> dict[str, Any]:
         None,
     )
     if filename_col is None or collector_col is None:
-        return {}
+        raise ValueError("metadata must contain filename and collector_id columns")
     return {
         str(row[filename_col]): row[collector_col]
         for _, row in metadata[[filename_col, collector_col]].dropna(subset=[filename_col]).iterrows()

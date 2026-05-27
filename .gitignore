@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments and local config
+.venv/
+venv/
+env/
+.env
+.env.*
+
+# Course dataset and raw audio
+data/
+*.wav
+*.flac
+*.mp3
+
+# Generated outputs and large artifacts
+results/*.npz
+results/*.pkl
+results/*.joblib
+results/*.json
+results/*.csv
+results/figures/*
+!results/log.md
+!results/figures/.gitkeep
+*.pdf
+
+# Notebooks are scratch by convention
+notebooks/*.ipynb
+
+# OS/editor files
+.DS_Store
+.idea/
+.vscode/

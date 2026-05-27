@@ -111,7 +111,7 @@ def test_aggregate_labels_masks_all_zero_inactive_annotator():
 
 
 def test_aggregate_labels_rejects_invalid_shape():
-    with pytest.raises(ValueError, match=r"\\[T, C, A\\]"):
+    with pytest.raises(ValueError, match=r"\[T, C, A\]"):
         aggregate_labels(np.zeros((2, 15), dtype=np.float32))
 
 

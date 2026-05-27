@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-27T17:15:00Z"
-last_activity: 2026-05-27 -- Phase 04 MLX MLP code implemented with synthetic tests; real sweep blocked by preprocessed cache
+last_updated: "2026-05-27T17:35:00Z"
+last_activity: 2026-05-27 -- Phase 05 final evaluation/case-study tooling implemented with synthetic tests; real outputs blocked by predictions
 progress:
   total_phases: 7
   completed_phases: 0
-  total_plans: 11
-  completed_plans: 11
+  total_plans: 14
+  completed_plans: 14
   percent: 0
 ---
 
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 
 ## Current Position
 
-Phase: 04 (MLX MLP Sweep) — VERIFICATION GAPS
+Phase: 05 (Final Evaluation and Case Study) — VERIFICATION GAPS
 Plan: 3 of 3 implemented
-Status: Real MLP sweep blocked on missing `results/preprocessed.npz`
-Last activity: 2026-05-27 -- Phase 04 MLX MLP code implemented with synthetic tests; real sweep blocked by preprocessed cache
+Status: Real final evaluation blocked on missing prediction artifacts
+Last activity: 2026-05-27 -- Phase 05 final evaluation/case-study tooling implemented with synthetic tests; real outputs blocked by predictions
 
 Progress: [######----] implementation complete, verification blocked
 
@@ -47,7 +47,7 @@ Progress: [######----] implementation complete, verification blocked
 
 **Recent Trend:**
 
-- Last 5 plans: 03-01, 03-02, 04-01, 04-02, 04-03
+- Last 5 plans: 04-02, 04-03, 05-01, 05-02, 05-03
 - Trend: code paths moving forward; real runs blocked on local dataset verification
 
 *Updated after each plan completion*
@@ -73,6 +73,7 @@ None yet.
 - Phase 2 real artifacts are blocked until `results/dataset_cache.npz` exists; synthetic tests verify code behavior.
 - Phase 3 real LR sweep artifacts are blocked until `results/preprocessed.npz` exists; synthetic tests verify code behavior.
 - Phase 4 real MLP sweep artifacts are blocked until `results/preprocessed.npz` exists; synthetic tests verify code behavior.
+- Phase 5 real final outputs are blocked until real baseline/LR/MLP predictions exist; synthetic tests verify code behavior.
 - Task 3 code/report and LaTeX templates should be added if available.
 - Deadline is May 28, 2026, 23:59; optional experiments must be cut if they threaten report/slides.
 
@@ -84,6 +85,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-27T17:15:00Z
-Stopped at: Phase 4 implemented; verification gaps documented
-Resume file: .planning/phases/04-mlx-mlp-sweep/04-VERIFICATION.md
+Last session: 2026-05-27T17:35:00Z
+Stopped at: Phase 5 implemented; verification gaps documented
+Resume file: .planning/phases/05-final-evaluation-and-case-study/05-VERIFICATION.md

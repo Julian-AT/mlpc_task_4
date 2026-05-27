@@ -124,12 +124,12 @@ No v2 scope is planned. Future challenge-task work should be tracked separately 
 | MLP-04 | Phase 4 | Implemented; real state blocked by DATA-05 |
 | MLP-05 | Phase 4 | Deferred until real sweep exists |
 | MLP-06 | Phase 4 | Deferred optional ablation |
-| FINAL-01 | Phase 5 | Pending |
-| FINAL-02 | Phase 5 | Pending |
-| CASE-01 | Phase 5 | Pending |
-| CASE-02 | Phase 5 | Pending |
-| CASE-03 | Phase 5 | Pending |
-| CASE-04 | Phase 5 | Pending |
+| FINAL-01 | Phase 5 | Implemented; real comparison blocked by DATA-05 |
+| FINAL-02 | Phase 5 | Implemented; real outputs blocked by DATA-05 |
+| CASE-01 | Phase 5 | Implemented; real selection blocked by DATA-05 |
+| CASE-02 | Phase 5 | Implemented; real figures blocked by DATA-05 |
+| CASE-03 | Phase 5 | Deferred until real results exist |
+| CASE-04 | Phase 5 | Implemented scaffold; real notes blocked by DATA-05 |
 | DOC-01 | Phase 6 | Pending |
 | DOC-02 | Phase 6 | Pending |
 | DOC-03 | Phase 6 | Pending |

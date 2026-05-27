@@ -15,7 +15,7 @@ The project moves from a reproducible data foundation to classifier experiments,
 - [ ] **Phase 2: Splits, Preprocessing, Metrics, and Baseline** - Establish leakage-safe evaluation inputs and baseline performance. (implemented 2026-05-27; real artifacts blocked by missing dataset cache)
 - [ ] **Phase 3: Logistic Regression Sweep** - Train, tune, save, and visualize the linear model family. (implemented 2026-05-27; real sweep blocked by missing preprocessed cache)
 - [ ] **Phase 4: MLX MLP Sweep** - Train, tune, save, and visualize the nonlinear temporal-context model family. (implemented 2026-05-27; real sweep blocked by missing preprocessed cache)
-- [ ] **Phase 5: Final Evaluation and Case Study** - Compare final models on test data and generate qualitative case-study evidence.
+- [ ] **Phase 5: Final Evaluation and Case Study** - Compare final models on test data and generate qualitative case-study evidence. (implemented 2026-05-27; real outputs blocked by missing predictions)
 - [ ] **Phase 6: Report** - Write and compile the 6-page, 2000-word report against the official rubric.
 - [ ] **Phase 7: Slides and Submission** - Build the Case Study and Reflection slide deck and perform final submission checks.
 
@@ -184,6 +184,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 2. Splits, Preprocessing, Metrics, and Baseline | 3/3 | Implemented; blocked on dataset cache | - |
 | 3. Logistic Regression Sweep | 2/2 | Implemented; blocked on preprocessed cache | - |
 | 4. MLX MLP Sweep | 3/3 | Implemented; blocked on preprocessed cache | - |
-| 5. Final Evaluation and Case Study | 0/3 | Not started | - |
+| 5. Final Evaluation and Case Study | 3/3 | Implemented; blocked on predictions | - |
 | 6. Report | 0/3 | Not started | - |
 | 7. Slides and Submission | 0/2 | Not started | - |

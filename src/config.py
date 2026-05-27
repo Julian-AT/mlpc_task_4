@@ -21,6 +21,8 @@ LR_BEST_MODEL = RESULTS_DIR / "lr_best.pkl"
 PREDICTIONS_TEST = RESULTS_DIR / "predictions_test.npz"
 MLP_SWEEP_CSV = RESULTS_DIR / "mlp_sweep.csv"
 MLP_BEST_MODEL = RESULTS_DIR / "mlp_best.npz"
+FINAL_TABLE_CSV = RESULTS_DIR / "final_table.csv"
+CASE_STUDY_NOTES = RESULTS_DIR / "case_study_notes.md"
 RESULTS_LOG = RESULTS_DIR / "log.md"
 
 # Seeds and splits

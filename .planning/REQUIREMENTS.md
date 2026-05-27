@@ -18,8 +18,8 @@
 - [x] **DATA-02**: Feature concatenation combines all available base feature aggregations consistently and records the final feature dimensionality.
 - [x] **DATA-03**: Label aggregation converts each `.npz` `annotations` array from `[T, C, A]` overlap values to `[T, C]` binary labels using 0.5 binarization and majority voting over valid annotators.
 - [x] **DATA-04**: Label aggregation correctly handles single-annotator files and masks annotators that did not annotate a file instead of counting them as negative votes.
-- [x] **DATA-05**: Dataset cache stores features, labels, file IDs, collector IDs, segment indices, start times, end times, and class names under `results/dataset_cache.npz`.
-- [x] **DATA-06**: Data preparation sanity checks print or log segment count, class names/order, positive rates, and feature dimensionality.
+- [ ] **DATA-05**: Dataset cache stores features, labels, file IDs, collector IDs, segment indices, start times, end times, and class names under `results/dataset_cache.npz`.
+- [ ] **DATA-06**: Data preparation sanity checks print or log segment count, class names/order, positive rates, and feature dimensionality.
 
 ### Splits and Preprocessing
 
@@ -101,8 +101,8 @@ No v2 scope is planned. Future challenge-task work should be tracked separately 
 | DATA-02 | Phase 1 | Complete |
 | DATA-03 | Phase 1 | Complete |
 | DATA-04 | Phase 1 | Complete |
-| DATA-05 | Phase 1 | Complete |
-| DATA-06 | Phase 1 | Complete |
+| DATA-05 | Phase 1 | Blocked: local dataset required |
+| DATA-06 | Phase 1 | Blocked: local dataset required |
 | SPLIT-01 | Phase 2 | Pending |
 | SPLIT-02 | Phase 2 | Pending |
 | SPLIT-03 | Phase 2 | Pending |

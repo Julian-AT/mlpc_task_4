@@ -24,7 +24,8 @@ key-decisions:
 patterns-established:
   - "Dataset-dependent smoke checks are documented when local data is unavailable."
   - "Synthetic .npz fixtures validate cache schema without committing course data."
-requirements-completed: [DATA-03, DATA-04, DATA-05, DATA-06]
+requirements-completed: [DATA-03, DATA-04]
+requirements-blocked: [DATA-05, DATA-06]
 duration: 12 min
 completed: 2026-05-27
 ---
@@ -53,6 +54,7 @@ completed: 2026-05-27
 1. **RED tests** - `30e2815` (`test(01-03): add failing tests for label aggregation`)
 2. **GREEN implementation** - `e6db4e3` (`feat(01-03): implement dataset cache`)
 3. **Smoke status note** - `de137f6` (`refactor(01-03): record dataset smoke status`)
+4. **Metadata contract fix** - `d5755d3` (`fix(01-03): require metadata collector mapping`)
 
 ## Files Created/Modified
 
@@ -67,7 +69,20 @@ completed: 2026-05-27
 
 ## Deviations from Plan
 
-None - plan executed exactly as written.
+### Auto-fixed Issues
+
+**1. [Rule 2 - Missing Critical] Fail loudly when metadata lacks collector mapping**
+- **Found during:** Verification scan after Task 3.
+- **Issue:** `_metadata_lookup` returned an empty mapping when metadata lacked filename or collector columns, which could silently write empty `collector_ids`.
+- **Fix:** Changed the helper to raise `ValueError("metadata must contain filename and collector_id columns")`.
+- **Files modified:** `src/data.py`
+- **Verification:** `python -m pytest -q --tb=short` passed.
+- **Committed in:** `d5755d3`
+
+---
+
+**Total deviations:** 1 auto-fixed (missing critical).
+**Impact on plan:** Strengthens the cache contract required by DATA-05; no scope change.
 
 ## Issues Encountered
 

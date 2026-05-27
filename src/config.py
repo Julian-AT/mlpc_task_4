@@ -19,6 +19,8 @@ BASELINE_JSON = RESULTS_DIR / "baseline.json"
 LR_SWEEP_CSV = RESULTS_DIR / "lr_sweep.csv"
 LR_BEST_MODEL = RESULTS_DIR / "lr_best.pkl"
 PREDICTIONS_TEST = RESULTS_DIR / "predictions_test.npz"
+MLP_SWEEP_CSV = RESULTS_DIR / "mlp_sweep.csv"
+MLP_BEST_MODEL = RESULTS_DIR / "mlp_best.npz"
 RESULTS_LOG = RESULTS_DIR / "log.md"
 
 # Seeds and splits

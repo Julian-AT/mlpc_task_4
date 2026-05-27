@@ -118,12 +118,12 @@ No v2 scope is planned. Future challenge-task work should be tracked separately 
 | LR-03 | Phase 3 | Implemented; real model blocked by DATA-05 |
 | LR-04 | Phase 3 | Implemented; real figure blocked by DATA-05 |
 | LR-05 | Phase 3 | Deferred optional ablation |
-| MLP-01 | Phase 4 | Pending |
-| MLP-02 | Phase 4 | Pending |
-| MLP-03 | Phase 4 | Pending |
-| MLP-04 | Phase 4 | Pending |
-| MLP-05 | Phase 4 | Pending |
-| MLP-06 | Phase 4 | Pending |
+| MLP-01 | Phase 4 | Implemented |
+| MLP-02 | Phase 4 | Implemented; real training blocked by DATA-05 |
+| MLP-03 | Phase 4 | Implemented; real sweep blocked by DATA-05 |
+| MLP-04 | Phase 4 | Implemented; real state blocked by DATA-05 |
+| MLP-05 | Phase 4 | Deferred until real sweep exists |
+| MLP-06 | Phase 4 | Deferred optional ablation |
 | FINAL-01 | Phase 5 | Pending |
 | FINAL-02 | Phase 5 | Pending |
 | CASE-01 | Phase 5 | Pending |

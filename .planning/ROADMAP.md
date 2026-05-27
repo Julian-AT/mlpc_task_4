@@ -13,7 +13,7 @@ The project moves from a reproducible data foundation to classifier experiments,
 
 - [ ] **Phase 1: Project Scaffold and Data Foundation** - Set up the repo structure, load the dataset, aggregate labels, and create the dataset cache. (implemented 2026-05-27; verification blocked by missing local dataset)
 - [ ] **Phase 2: Splits, Preprocessing, Metrics, and Baseline** - Establish leakage-safe evaluation inputs and baseline performance. (implemented 2026-05-27; real artifacts blocked by missing dataset cache)
-- [ ] **Phase 3: Logistic Regression Sweep** - Train, tune, save, and visualize the linear model family.
+- [ ] **Phase 3: Logistic Regression Sweep** - Train, tune, save, and visualize the linear model family. (implemented 2026-05-27; real sweep blocked by missing preprocessed cache)
 - [ ] **Phase 4: MLX MLP Sweep** - Train, tune, save, and visualize the nonlinear temporal-context model family.
 - [ ] **Phase 5: Final Evaluation and Case Study** - Compare final models on test data and generate qualitative case-study evidence.
 - [ ] **Phase 6: Report** - Write and compile the 6-page, 2000-word report against the official rubric.
@@ -182,7 +182,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 |-------|----------------|--------|-----------|
 | 1. Project Scaffold and Data Foundation | 3/3 | Blocked on local dataset | - |
 | 2. Splits, Preprocessing, Metrics, and Baseline | 3/3 | Implemented; blocked on dataset cache | - |
-| 3. Logistic Regression Sweep | 0/2 | Not started | - |
+| 3. Logistic Regression Sweep | 2/2 | Implemented; blocked on preprocessed cache | - |
 | 4. MLX MLP Sweep | 0/3 | Not started | - |
 | 5. Final Evaluation and Case Study | 0/3 | Not started | - |
 | 6. Report | 0/3 | Not started | - |

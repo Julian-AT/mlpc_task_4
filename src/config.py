@@ -16,6 +16,9 @@ PREPROCESSED_CACHE = RESULTS_DIR / "preprocessed.npz"
 SCALER_PATH = RESULTS_DIR / "scaler.joblib"
 PER_FILE_IOU_PATH = RESULTS_DIR / "per_file_iou.npz"
 BASELINE_JSON = RESULTS_DIR / "baseline.json"
+LR_SWEEP_CSV = RESULTS_DIR / "lr_sweep.csv"
+LR_BEST_MODEL = RESULTS_DIR / "lr_best.pkl"
+PREDICTIONS_TEST = RESULTS_DIR / "predictions_test.npz"
 RESULTS_LOG = RESULTS_DIR / "log.md"
 
 # Seeds and splits

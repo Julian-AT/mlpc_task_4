@@ -113,11 +113,11 @@ No v2 scope is planned. Future challenge-task work should be tracked separately 
 | EVAL-02 | Phase 2 | Implemented; real output blocked by DATA-05 |
 | EVAL-03 | Phase 2 | Implemented; real output blocked by DATA-05 |
 | EVAL-04 | Phase 2 | Deferred to report prose |
-| LR-01 | Phase 3 | Pending |
-| LR-02 | Phase 3 | Pending |
-| LR-03 | Phase 3 | Pending |
-| LR-04 | Phase 3 | Pending |
-| LR-05 | Phase 3 | Pending |
+| LR-01 | Phase 3 | Implemented |
+| LR-02 | Phase 3 | Implemented; real sweep blocked by DATA-05 |
+| LR-03 | Phase 3 | Implemented; real model blocked by DATA-05 |
+| LR-04 | Phase 3 | Implemented; real figure blocked by DATA-05 |
+| LR-05 | Phase 3 | Deferred optional ablation |
 | MLP-01 | Phase 4 | Pending |
 | MLP-02 | Phase 4 | Pending |
 | MLP-03 | Phase 4 | Pending |

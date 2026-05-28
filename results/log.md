@@ -1,6 +1,6 @@
 # Results Log
 
-## Phase 1: Project Scaffold and Data Foundation
+## Dataset Cache
 
 - Files processed: 3656
 - Total segments: 168239

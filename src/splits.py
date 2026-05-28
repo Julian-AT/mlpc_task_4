@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Mapping
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -40,7 +40,6 @@ def make_splits(
     test_frac: float = config.TEST_FRAC,
     seed: int = config.SEED,
 ) -> dict[str, np.ndarray]:
-    """Create collector-disjoint train/validation/test segment indices."""
     groups = np.asarray(collector_ids)
     if groups.ndim != 1:
         raise ValueError("collector_ids must be one-dimensional")
@@ -111,7 +110,11 @@ def save_splits(
 
 
 def plot_class_distribution(table: pd.DataFrame, output_path: Path | str | None = None) -> None:
-    path = Path(output_path) if output_path is not None else config.FIG_DIR / "class_dist_across_splits.png"
+    path = (
+        Path(output_path)
+        if output_path is not None
+        else config.FIG_DIR / "class_dist_across_splits.png"
+    )
     path.parent.mkdir(parents=True, exist_ok=True)
 
     x = np.arange(len(table))
@@ -138,7 +141,9 @@ def build_splits(
     save_splits(splits, split_path)
 
     table = class_distribution_table(dataset["labels"], splits, dataset["class_names"])
-    csv_path = Path(distribution_path) if distribution_path is not None else config.CLASS_DISTRIBUTION_CSV
+    csv_path = (
+        Path(distribution_path) if distribution_path is not None else config.CLASS_DISTRIBUTION_CSV
+    )
     csv_path.parent.mkdir(parents=True, exist_ok=True)
     table.to_csv(csv_path, index=False)
     plot_class_distribution(table)

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Mapping
 
 import joblib
 import numpy as np
@@ -35,7 +35,6 @@ def add_temporal_context(
     file_ids: np.ndarray,
     k: int = config.TEMPORAL_CONTEXT,
 ) -> np.ndarray:
-    """Concatenate frames t-k through t+k, zero-padding across file boundaries."""
     x = np.asarray(features, dtype=np.float32)
     files = np.asarray(file_ids)
     if x.ndim != 2:
@@ -59,11 +58,9 @@ def add_temporal_context(
     return out
 
 
-def per_file_per_class_iou(annotations: np.ndarray, threshold: float = config.ANNOT_BINARIZE_THRESH) -> np.ndarray:
-    """Mean pairwise annotator IoU per file and class.
-
-    Accepts `[F, T, C, A]` or a single-file `[T, C, A]` annotation tensor.
-    """
+def per_file_per_class_iou(
+    annotations: np.ndarray, threshold: float = config.ANNOT_BINARIZE_THRESH
+) -> np.ndarray:
     ann = np.asarray(annotations, dtype=np.float32)
     if ann.ndim == 3:
         ann = ann[None, ...]
@@ -109,7 +106,10 @@ def high_agreement_mask(
         lookup = {str(file_id): float(values[i, class_idx]) for i, file_id in enumerate(file_order)}
 
     return np.asarray(
-        [np.isfinite(lookup.get(str(file_id), np.nan)) and lookup[str(file_id)] >= threshold for file_id in files],
+        [
+            np.isfinite(lookup.get(str(file_id), np.nan)) and lookup[str(file_id)] >= threshold
+            for file_id in files
+        ],
         dtype=bool,
     )
 

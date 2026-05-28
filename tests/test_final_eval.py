@@ -2,7 +2,12 @@ import json
 
 import numpy as np
 
-from src.final_eval import build_final_table, plot_case_study, select_case_studies, write_case_study_notes
+from src.final_eval import (
+    build_final_table,
+    plot_case_study,
+    select_case_studies,
+    write_case_study_notes,
+)
 
 
 def test_build_final_table_compares_baseline_lr_and_mlp(tmp_path):
@@ -25,7 +30,9 @@ def test_build_final_table_compares_baseline_lr_and_mlp(tmp_path):
         predictions_path,
         y_test=y_test,
         lr_test_scores=np.array([[0.9, 0.1], [0.1, 0.8], [0.7, 0.6], [0.2, 0.3]], dtype=np.float32),
-        mlp_test_scores=np.array([[0.8, 0.2], [0.2, 0.9], [0.6, 0.7], [0.3, 0.1]], dtype=np.float32),
+        mlp_test_scores=np.array(
+            [[0.8, 0.2], [0.2, 0.9], [0.6, 0.7], [0.3, 0.1]], dtype=np.float32
+        ),
         class_names=np.array(["a", "b"], dtype=object),
     )
 

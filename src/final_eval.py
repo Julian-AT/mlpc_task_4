@@ -12,14 +12,21 @@ from . import config
 from .metrics import macro_ap, micro_ap, per_class_ap
 
 
-def _metric_row(name: str, y_true: np.ndarray, y_score: np.ndarray, class_names: list[str] | np.ndarray) -> dict[str, Any]:
+def _metric_row(
+    name: str, y_true: np.ndarray, y_score: np.ndarray, class_names: list[str] | np.ndarray
+) -> dict[str, Any]:
     ap = per_class_ap(y_true, y_score)
     row = {
         "model": name,
         "macro_ap": macro_ap(y_true, y_score),
         "micro_ap": micro_ap(y_true, y_score),
     }
-    row.update({f"ap_{class_name}": float(value) for class_name, value in zip(class_names, ap, strict=True)})
+    row.update(
+        {
+            f"ap_{class_name}": float(value)
+            for class_name, value in zip(class_names, ap, strict=True)
+        }
+    )
     return row
 
 
@@ -45,7 +52,9 @@ def build_final_table(
             }
         ]
         if "lr_test_scores" in loaded.files:
-            rows.append(_metric_row("logistic_regression", y_test, loaded["lr_test_scores"], class_names))
+            rows.append(
+                _metric_row("logistic_regression", y_test, loaded["lr_test_scores"], class_names)
+            )
         if "mlp_test_scores" in loaded.files:
             rows.append(_metric_row("mlx_mlp", y_test, loaded["mlp_test_scores"], class_names))
 
@@ -100,13 +109,17 @@ def plot_case_study(
     score = np.asarray(y_score)[mask].T
     x = np.asarray(times)[mask] if times is not None else np.arange(score.shape[1])
 
-    output = Path(output_path) if output_path is not None else config.FIG_DIR / f"case_{file_id}.png"
+    output = (
+        Path(output_path) if output_path is not None else config.FIG_DIR / f"case_{file_id}.png"
+    )
     output.parent.mkdir(parents=True, exist_ok=True)
     fig, axes = plt.subplots(2, 1, figsize=(10, 6), sharex=True, constrained_layout=True)
     axes[0].imshow(truth, aspect="auto", interpolation="nearest", cmap="Greys", origin="lower")
     axes[0].set_title(f"{file_id} ground truth")
     axes[0].set_yticks(np.arange(len(class_names)), class_names)
-    image = axes[1].imshow(score, aspect="auto", interpolation="nearest", vmin=0, vmax=1, origin="lower")
+    image = axes[1].imshow(
+        score, aspect="auto", interpolation="nearest", vmin=0, vmax=1, origin="lower"
+    )
     axes[1].set_title("Predicted probabilities")
     axes[1].set_yticks(np.arange(len(class_names)), class_names)
     axes[1].set_xlabel("segment" if times is None else "time (s)")

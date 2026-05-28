@@ -56,10 +56,14 @@ def best_threshold_f1(y_true_c: np.ndarray, y_score_c: np.ndarray) -> tuple[floa
     return best_threshold, best_f1
 
 
-def per_class_f1_at_optimal(y_true: np.ndarray, y_score: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+def per_class_f1_at_optimal(
+    y_true: np.ndarray, y_score: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
     true, score = _validate_targets(y_true, y_score)
     thresholds = np.zeros(true.shape[1], dtype=np.float32)
     f1s = np.zeros(true.shape[1], dtype=np.float32)
     for class_idx in range(true.shape[1]):
-        thresholds[class_idx], f1s[class_idx] = best_threshold_f1(true[:, class_idx], score[:, class_idx])
+        thresholds[class_idx], f1s[class_idx] = best_threshold_f1(
+            true[:, class_idx], score[:, class_idx]
+        )
     return thresholds, f1s

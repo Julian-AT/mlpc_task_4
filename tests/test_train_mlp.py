@@ -1,7 +1,15 @@
 import joblib
 import numpy as np
 
-from src.train_mlp import HAS_MLX, MLP, _train_one_sklearn, positive_class_weights, predict_proba, sweep_mlp, train_one
+from src.train_mlp import (
+    HAS_MLX,
+    MLP,
+    _train_one_sklearn,
+    positive_class_weights,
+    predict_proba,
+    sweep_mlp,
+    train_one,
+)
 
 
 def _synthetic_mlp_data():

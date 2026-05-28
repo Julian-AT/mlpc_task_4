@@ -2,7 +2,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-# Paths
 DATA_DIR = ROOT / "data"
 FEATURES_DIR = DATA_DIR / "audio_features"
 METADATA_CSV = DATA_DIR / "metadata.csv"
@@ -25,23 +24,18 @@ FINAL_TABLE_CSV = RESULTS_DIR / "final_table.csv"
 CASE_STUDY_NOTES = RESULTS_DIR / "case_study_notes.md"
 RESULTS_LOG = RESULTS_DIR / "log.md"
 
-# Seeds and splits
 SEED = 42
 TRAIN_FRAC = 0.70
 VAL_FRAC = 0.15
 TEST_FRAC = 0.15
 
-# Label aggregation
 ANNOT_BINARIZE_THRESH = 0.5
 MAJORITY_THRESH = 0.5
 
-# Features
 TEMPORAL_CONTEXT = 2
 
-# High-agreement filter
 HIGH_AGREEMENT_IOU = 0.6
 
-# Class names are alphabetical and must match the dataset.
 CLASS_NAMES = [
     "bell_ringing",
     "coffee_machine",

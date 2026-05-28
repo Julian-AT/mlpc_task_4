@@ -19,15 +19,23 @@ def class_prior_baseline_scores(y_train: np.ndarray, n_rows: int) -> np.ndarray:
     return np.tile(prevalence, (int(n_rows), 1)).astype(np.float32, copy=False)
 
 
-def evaluate_scores(y_true: np.ndarray, y_score: np.ndarray, class_names: list[str] | np.ndarray) -> dict[str, Any]:
+def evaluate_scores(
+    y_true: np.ndarray, y_score: np.ndarray, class_names: list[str] | np.ndarray
+) -> dict[str, Any]:
     ap = per_class_ap(y_true, y_score)
     thresholds, f1s = per_class_f1_at_optimal(y_true, y_score)
     return {
         "macro_ap": macro_ap(y_true, y_score),
         "micro_ap": micro_ap(y_true, y_score),
-        "per_class_ap": {str(name): float(value) for name, value in zip(class_names, ap, strict=True)},
-        "thresholds": {str(name): float(value) for name, value in zip(class_names, thresholds, strict=True)},
-        "per_class_f1": {str(name): float(value) for name, value in zip(class_names, f1s, strict=True)},
+        "per_class_ap": {
+            str(name): float(value) for name, value in zip(class_names, ap, strict=True)
+        },
+        "thresholds": {
+            str(name): float(value) for name, value in zip(class_names, thresholds, strict=True)
+        },
+        "per_class_f1": {
+            str(name): float(value) for name, value in zip(class_names, f1s, strict=True)
+        },
     }
 
 

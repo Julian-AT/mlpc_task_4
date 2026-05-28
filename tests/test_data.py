@@ -3,7 +3,13 @@ import pandas as pd
 import pytest
 
 from src import config
-from src.data import aggregate_labels, build_dataset, concat_features, load_annotations, load_metadata
+from src.data import (
+    aggregate_labels,
+    build_dataset,
+    concat_features,
+    load_annotations,
+    load_metadata,
+)
 
 
 def test_config_class_names_are_alphabetical():

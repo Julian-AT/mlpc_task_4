@@ -1,13 +1,13 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 import numpy as np
 import pandas as pd
 
 from . import config
-
 
 NON_FEATURE_KEYS = {
     "annotations",
@@ -35,17 +35,14 @@ NON_FEATURE_KEYS = {
 
 
 def load_metadata(path: Path | str | None = None) -> pd.DataFrame:
-    """Load the task metadata CSV from an explicit path or the configured dataset path."""
     return pd.read_csv(Path(path) if path is not None else config.METADATA_CSV)
 
 
 def load_annotations(path: Path | str | None = None) -> pd.DataFrame:
-    """Load the task annotations CSV from an explicit path or the configured dataset path."""
     return pd.read_csv(Path(path) if path is not None else config.ANNOTATIONS_CSV)
 
 
 def iter_feature_files(features_dir: Path | str | None = None) -> list[Path]:
-    """Return feature `.npz` files in deterministic order."""
     directory = Path(features_dir) if features_dir is not None else config.FEATURES_DIR
     return sorted(directory.glob("*.npz"))
 
@@ -71,11 +68,6 @@ def _as_feature_matrix(value: Any, key: str, segment_count: int | None) -> np.nd
 
 
 def concat_features(npz_dict: Mapping[str, Any]) -> tuple[np.ndarray, list[str]]:
-    """Concatenate compatible numeric feature arrays in stable key order.
-
-    Non-feature metadata arrays are excluded explicitly. All selected arrays must share the
-    same first dimension, which is interpreted as the segment count.
-    """
     keys = sorted(
         key
         for key, value in npz_dict.items()
@@ -90,7 +82,6 @@ def concat_features(npz_dict: Mapping[str, Any]) -> tuple[np.ndarray, list[str]]
 
 
 def aggregate_labels(annotations: np.ndarray) -> np.ndarray:
-    """Aggregate `[T, C, A]` overlap annotations to `[T, C]` binary labels."""
     ann = np.asarray(annotations, dtype=np.float32)
     if ann.ndim != 3:
         raise ValueError("annotations must have shape [T, C, A]")
@@ -116,12 +107,16 @@ def _npz_class_names(npz_dict: Mapping[str, Any]) -> list[str]:
     return [str(name) for name in np.asarray(npz_dict["class_names"]).tolist()]
 
 
-def _time_array(npz_dict: Mapping[str, Any], keys: tuple[str, ...], segment_count: int) -> np.ndarray:
+def _time_array(
+    npz_dict: Mapping[str, Any], keys: tuple[str, ...], segment_count: int
+) -> np.ndarray:
     for key in keys:
         if key in npz_dict:
             arr = np.asarray(npz_dict[key], dtype=np.float32)
             if arr.shape[0] != segment_count:
-                raise ValueError(f"{key!r} has segment count {arr.shape[0]}, expected {segment_count}")
+                raise ValueError(
+                    f"{key!r} has segment count {arr.shape[0]}, expected {segment_count}"
+                )
             return arr
     starts = np.arange(segment_count, dtype=np.float32) * 0.5
     if "end" in keys[0]:
@@ -131,7 +126,11 @@ def _time_array(npz_dict: Mapping[str, Any], keys: tuple[str, ...], segment_coun
 
 def _metadata_lookup(metadata: pd.DataFrame) -> dict[str, Any]:
     filename_col = next(
-        (col for col in ["filename", "file", "file_name", "audio_filename"] if col in metadata.columns),
+        (
+            col
+            for col in ["filename", "file", "file_name", "audio_filename"]
+            if col in metadata.columns
+        ),
         None,
     )
     collector_col = next(
@@ -142,7 +141,9 @@ def _metadata_lookup(metadata: pd.DataFrame) -> dict[str, Any]:
         raise ValueError("metadata must contain filename and collector_id columns")
     return {
         str(row[filename_col]): row[collector_col]
-        for _, row in metadata[[filename_col, collector_col]].dropna(subset=[filename_col]).iterrows()
+        for _, row in metadata[[filename_col, collector_col]]
+        .dropna(subset=[filename_col])
+        .iterrows()
     }
 
 
@@ -165,12 +166,15 @@ def _write_log(summary: dict[str, Any], log_path: Path) -> None:
     class_lines = "\n".join(
         f"  - {name}: {count} positives ({rate:.6f})"
         for name, count, rate in zip(
-            summary["class_names"], summary["positive_counts"], summary["positive_rates"], strict=True
+            summary["class_names"],
+            summary["positive_counts"],
+            summary["positive_rates"],
+            strict=True,
         )
     )
     text = (
         "# Results Log\n\n"
-        "## Phase 1: Project Scaffold and Data Foundation\n\n"
+        "## Dataset Cache\n\n"
         f"- Files processed: {summary['file_count']}\n"
         f"- Total segments: {summary['segment_count']}\n"
         f"- Feature dimensionality: {summary['feature_dim']}\n"
@@ -184,14 +188,13 @@ def _write_log(summary: dict[str, Any], log_path: Path) -> None:
 
 
 def build_dataset(cache_path: Path | str | None = None) -> dict[str, np.ndarray]:
-    """Build and cache the segment-level dataset arrays."""
     cache = Path(cache_path) if cache_path is not None else config.DATASET_CACHE
     feature_files = iter_feature_files()
     if not feature_files:
         raise FileNotFoundError(f"No .npz feature files found in {config.FEATURES_DIR}")
 
     metadata = load_metadata()
-    load_annotations()  # Validate that the expected CSV exists for reproducibility.
+    load_annotations()
     collectors = _metadata_lookup(metadata)
 
     features_parts: list[np.ndarray] = []
@@ -204,7 +207,7 @@ def build_dataset(cache_path: Path | str | None = None) -> dict[str, np.ndarray]
     expected_feature_keys: list[str] | None = None
     expected_feature_dim: int | None = None
 
-    for file_index, feature_file in enumerate(feature_files):
+    for feature_file in feature_files:
         with np.load(feature_file, allow_pickle=True) as loaded:
             npz_dict = {key: loaded[key] for key in loaded.files}
 

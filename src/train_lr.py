@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import itertools
 import time
+import warnings
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import joblib
 import matplotlib.pyplot as plt
@@ -49,14 +51,25 @@ def fit_one(
     )
     model = OneVsRestClassifier(base, n_jobs=-1)
     start = time.time()
-    model.fit(x_train, y_train)
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore", message="'penalty' was deprecated.*", category=FutureWarning
+        )
+        warnings.filterwarnings(
+            "ignore", message="Inconsistent values: penalty=.*", category=UserWarning
+        )
+        model.fit(x_train, y_train)
     val_scores = _predict_proba(model, x_val)
     runtime = time.time() - start
-    return model, val_scores, {
-        "macro_ap": macro_ap(y_val, val_scores),
-        "micro_ap": micro_ap(y_val, val_scores),
-        "runtime_s": runtime,
-    }
+    return (
+        model,
+        val_scores,
+        {
+            "macro_ap": macro_ap(y_val, val_scores),
+            "micro_ap": micro_ap(y_val, val_scores),
+            "runtime_s": runtime,
+        },
+    )
 
 
 def iter_grid(grid: dict[str, Iterable[Any]] | None = None) -> list[dict[str, Any]]:
@@ -111,7 +124,12 @@ def sweep_lr(
     best_val_scores: np.ndarray | None = None
     best_test_scores: np.ndarray | None = None
 
-    for params in iter_grid(grid):
+    grid_rows = iter_grid(grid)
+    for run_idx, params in enumerate(grid_rows, start=1):
+        print(
+            f"lr {run_idx}/{len(grid_rows)} "
+            f"C={params['C']} penalty={params['penalty']} class_weight={params['class_weight']}"
+        )
         model, val_scores, metrics = fit_one(
             x[train_idx],
             y[train_idx],
@@ -140,7 +158,9 @@ def sweep_lr(
         joblib.dump(best_model, model_output)
 
     if best_val_scores is not None and best_test_scores is not None:
-        pred_output = Path(predictions_path) if predictions_path is not None else config.PREDICTIONS_TEST
+        pred_output = (
+            Path(predictions_path) if predictions_path is not None else config.PREDICTIONS_TEST
+        )
         pred_output.parent.mkdir(parents=True, exist_ok=True)
         np.savez_compressed(
             pred_output,
@@ -161,7 +181,9 @@ def plot_lr_sweep(
     output_path: Path | str | None = None,
 ) -> None:
     source = Path(sweep_csv) if sweep_csv is not None else config.LR_SWEEP_CSV
-    output = Path(output_path) if output_path is not None else config.FIG_DIR / "lr_sweep_heatmap.png"
+    output = (
+        Path(output_path) if output_path is not None else config.FIG_DIR / "lr_sweep_heatmap.png"
+    )
     frame = pd.read_csv(source)
     pivot = frame.pivot_table(index="C", columns="penalty", values="macro_ap", aggfunc="mean")
 

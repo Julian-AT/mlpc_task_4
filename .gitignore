@@ -17,20 +17,16 @@ env/
 
 # Course dataset and raw audio
 data/
-resources_codex/*.zip
+resources/*.zip
+resources_codex/
 *.wav
 *.flac
 *.mp3
 
-# Generated outputs and large artifacts
+# Large generated artifacts
 results/*.npz
 results/*.pkl
 results/*.joblib
-results/*.json
-results/*.csv
-results/figures/*
-!results/log.md
-!results/figures/.gitkeep
 *.pdf
 
 # Notebooks are scratch by convention

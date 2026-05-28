@@ -2,13 +2,18 @@ from __future__ import annotations
 
 import itertools
 import time
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import joblib
 import numpy as np
 import pandas as pd
 from sklearn.neural_network import MLPClassifier
+
+from . import config
+from .metrics import macro_ap, micro_ap, per_class_ap
+from .train_lr import load_preprocessed
 
 try:
     import mlx.core as mx
@@ -30,15 +35,12 @@ except ModuleNotFoundError:
 
 HAS_TORCH_CUDA = torch is not None and torch_nn is not None and torch.cuda.is_available()
 
-from . import config
-from .metrics import macro_ap, micro_ap, per_class_ap
-from .train_lr import load_preprocessed
-
-
 if HAS_MLX:
 
-    class MLP(nn.Module):  # type: ignore[union-attr]
-        def __init__(self, in_dim: int, hidden_dims: Iterable[int], out_dim: int, dropout: float = 0.2):
+    class MLP(nn.Module):
+        def __init__(
+            self, in_dim: int, hidden_dims: Iterable[int], out_dim: int, dropout: float = 0.2
+        ):
             super().__init__()
             dims = [int(in_dim), *[int(dim) for dim in hidden_dims]]
             layers: list[nn.Module] = []
@@ -56,9 +58,9 @@ if HAS_MLX:
 else:
 
     class MLP:
-        """Small NumPy inference stub used only when MLX is unavailable."""
-
-        def __init__(self, in_dim: int, hidden_dims: Iterable[int], out_dim: int, dropout: float = 0.2):
+        def __init__(
+            self, in_dim: int, hidden_dims: Iterable[int], out_dim: int, dropout: float = 0.2
+        ):
             del dropout
             rng = np.random.default_rng(config.SEED)
             dims = [int(in_dim), *[int(dim) for dim in hidden_dims], int(out_dim)]
@@ -91,7 +93,9 @@ else:
 if torch_nn is not None:
 
     class TorchMLP(torch_nn.Module):
-        def __init__(self, in_dim: int, hidden_dims: Iterable[int], out_dim: int, dropout: float = 0.2):
+        def __init__(
+            self, in_dim: int, hidden_dims: Iterable[int], out_dim: int, dropout: float = 0.2
+        ):
             super().__init__()
             dims = [int(in_dim), *[int(dim) for dim in hidden_dims]]
             layers: list[torch_nn.Module] = []
@@ -135,7 +139,9 @@ def _batch_indices(n_rows: int, batch_size: int, seed: int) -> list[np.ndarray]:
 
 def _normalize_sklearn_scores(scores: Any) -> np.ndarray:
     if isinstance(scores, list):
-        return np.column_stack([score[:, 1] if score.ndim == 2 else score for score in scores]).astype(np.float32)
+        return np.column_stack(
+            [score[:, 1] if score.ndim == 2 else score for score in scores]
+        ).astype(np.float32)
     array = np.asarray(scores, dtype=np.float32)
     if array.ndim == 3 and array.shape[-1] == 2:
         return array[:, :, 1].astype(np.float32)
@@ -225,7 +231,9 @@ def _train_one_mlx(
 
         val_scores = predict_proba(model, x_val)
         val_macro = macro_ap(y_val, val_scores)
-        history.append({"epoch": float(epoch + 1), "loss": float(np.mean(losses)), "val_macro_ap": val_macro})
+        history.append(
+            {"epoch": float(epoch + 1), "loss": float(np.mean(losses)), "val_macro_ap": val_macro}
+        )
 
         if val_macro > best_macro:
             best_macro = val_macro
@@ -301,12 +309,16 @@ def _train_one_torch(
 
         val_scores = predict_proba(model, x_val, batch_size=max(int(batch_size), 4096))
         val_macro = macro_ap(y_val_uint, val_scores)
-        history.append({"epoch": float(epoch + 1), "loss": float(np.mean(losses)), "val_macro_ap": val_macro})
+        history.append(
+            {"epoch": float(epoch + 1), "loss": float(np.mean(losses)), "val_macro_ap": val_macro}
+        )
 
         if val_macro > best_macro:
             best_macro = val_macro
             best_scores = val_scores
-            best_state = {key: value.detach().cpu().clone() for key, value in model.state_dict().items()}
+            best_state = {
+                key: value.detach().cpu().clone() for key, value in model.state_dict().items()
+            }
             bad_epochs = 0
             if model_path is not None:
                 save_torch_model(model, Path(model_path), hidden_dims, dropout)
@@ -424,6 +436,14 @@ def iter_grid(grid: dict[str, Iterable[Any]] | None = None) -> list[dict[str, An
     ]
 
 
+def backend_name() -> str:
+    if HAS_MLX:
+        return "mlx"
+    if HAS_TORCH_CUDA:
+        return "torch_cuda"
+    return "sklearn"
+
+
 def default_model_path() -> Path:
     if HAS_MLX:
         return config.MLP_BEST_MODEL
@@ -466,7 +486,9 @@ def sweep_mlp(
     patience: int = config.MLP_PATIENCE,
 ) -> pd.DataFrame:
     dataset = data if data is not None else load_preprocessed()
-    x = np.asarray(dataset.get("features_context", dataset.get("features_scaled")), dtype=np.float32)
+    x = np.asarray(
+        dataset.get("features_context", dataset.get("features_scaled")), dtype=np.float32
+    )
     y = np.asarray(dataset["labels"], dtype=np.uint8)
     class_names = dataset.get("class_names", np.asarray(config.CLASS_NAMES, dtype=object))
     train_idx = np.asarray(dataset["train_idx"], dtype=np.int64)
@@ -480,7 +502,12 @@ def sweep_mlp(
 
     model_output = Path(model_path) if model_path is not None else default_model_path()
     grid_rows = iter_grid(grid)
-    for params in grid_rows:
+    print(f"mlp backend={backend_name()}")
+    for run_idx, params in enumerate(grid_rows, start=1):
+        print(
+            f"mlp {run_idx}/{len(grid_rows)} "
+            f"hidden_dims={params['hidden_dims']} dropout={params['dropout']} lr={params['lr']}"
+        )
         candidate_path = model_output if len(grid_rows) == 1 else None
         model, val_scores, metrics = train_one(
             x[train_idx],
@@ -505,7 +532,9 @@ def sweep_mlp(
             "runtime_s": metrics["runtime_s"],
             "epochs": metrics["epochs"],
         }
-        row.update({f"ap_{name}": float(value) for name, value in zip(class_names, ap, strict=True)})
+        row.update(
+            {f"ap_{name}": float(value) for name, value in zip(class_names, ap, strict=True)}
+        )
         rows.append(row)
         if metrics["macro_ap"] > best_macro:
             best_macro = metrics["macro_ap"]
@@ -520,7 +549,9 @@ def sweep_mlp(
 
     if best_model is not None and best_val_scores is not None:
         test_scores = predict_proba(best_model, x[test_idx])
-        pred_output = Path(predictions_path) if predictions_path is not None else config.PREDICTIONS_TEST
+        pred_output = (
+            Path(predictions_path) if predictions_path is not None else config.PREDICTIONS_TEST
+        )
         existing: dict[str, np.ndarray] = {}
         if pred_output.exists():
             with np.load(pred_output, allow_pickle=True) as loaded:

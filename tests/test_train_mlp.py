@@ -1,7 +1,7 @@
 import joblib
 import numpy as np
 
-from src.train_mlp import MLP, _train_one_sklearn, positive_class_weights, predict_proba, sweep_mlp, train_one
+from src.train_mlp import HAS_MLX, MLP, _train_one_sklearn, positive_class_weights, predict_proba, sweep_mlp, train_one
 
 
 def _synthetic_mlp_data():
@@ -86,7 +86,8 @@ def test_train_one_writes_weights_and_history(tmp_path):
     assert weight_path.exists()
     assert scores.shape == (2, 2)
     assert metrics["epochs"] >= 1
-    assert metrics["history"]
+    if HAS_MLX:
+        assert metrics["history"]
     assert model is not None
 
 

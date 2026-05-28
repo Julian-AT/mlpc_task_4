@@ -36,6 +36,8 @@ results/figures/
 results/mlp_refine_sweep.csv
 results/pytest_tmp_codex/
 *.pdf
+!MLPC_task_4_report.pdf
+!MLPC_task_4_slides.pdf
 !report/figures/*.pdf
 !slides/figures/*.pdf
 

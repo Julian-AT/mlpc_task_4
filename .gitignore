@@ -17,6 +17,7 @@ env/
 
 # Course dataset and raw audio
 data/
+resources_codex/*.zip
 *.wav
 *.flac
 *.mp3

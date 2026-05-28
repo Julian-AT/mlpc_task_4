@@ -22,6 +22,15 @@ NON_FEATURE_KEYS = {
     "filename",
     "file_id",
     "collector_id",
+    "is_own_recording",
+    "target_classes",
+    "non_target_classes",
+    "recording_device",
+    "recording_environment",
+    "recording_environments",
+    "scene_description",
+    "device_placement",
+    "license",
 }
 
 

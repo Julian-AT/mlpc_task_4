@@ -32,6 +32,9 @@ def test_concat_features_deterministic_order_and_excludes_metadata():
         "annotations": np.zeros((2, 15, 1), dtype=np.float32),
         "start_time": np.array([0.0, 0.5]),
         "class_names": np.array(config.CLASS_NAMES),
+        "non_target_classes": np.array([], dtype=np.float32),
+        "is_own_recording": np.array([True]),
+        "recording_device": np.array("phone"),
     }
 
     features, keys = concat_features(npz)

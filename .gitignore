@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *.pyo
 .pytest_cache/
+pytest_tmp/
 .mypy_cache/
 .ruff_cache/
 .coverage
@@ -31,6 +32,8 @@ results/*.pt
 results/*.log
 results/*.err
 results/*_candidates/
+results/figures/
+results/mlp_refine_sweep.csv
 results/pytest_tmp_codex/
 *.pdf
 !report/figures/*.pdf
@@ -43,3 +46,14 @@ notebooks/*.ipynb
 .DS_Store
 .idea/
 .vscode/
+
+# LaTeX build files
+*.aux
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.log
+*.out
+*.synctex.gz
+*.toc

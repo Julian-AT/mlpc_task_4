@@ -1,8 +1,10 @@
+"""Generate report figures from result summaries and cached predictions."""
+
 from __future__ import annotations
 
-import json
-import shutil
-from pathlib import Path
+import matplotlib
+
+matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -10,7 +12,6 @@ import pandas as pd
 
 from . import config
 from .final_eval import _file_f1
-
 
 REPORT_FIG_DIR = config.ROOT / "report" / "figures"
 
@@ -21,13 +22,6 @@ def _short_label(name: str) -> str:
         .replace("wardrobe_drawer", "wardrobe")
         .replace("_", " ")
     )
-
-
-def copy_existing_figures() -> None:
-    REPORT_FIG_DIR.mkdir(parents=True, exist_ok=True)
-    source = config.FIG_DIR / "class_dist_across_splits.png"
-    if source.exists():
-        shutil.copyfile(source, REPORT_FIG_DIR / "class_dist_across_splits.png")
 
 
 def make_split_figure() -> None:
@@ -86,7 +80,6 @@ def make_hyperparameter_figure() -> None:
         right = min(0.66, float(frame["macro_ap"].max()) + 0.02)
         ax.set_xlim(left, right)
     fig.tight_layout()
-    fig.savefig(REPORT_FIG_DIR / "hyperparameter_summary.png", dpi=220)
     fig.savefig(REPORT_FIG_DIR / "hyperparameter_summary.pdf")
     plt.close(fig)
 
@@ -117,7 +110,6 @@ def make_per_class_ap_figure() -> None:
     ax.legend(frameon=False, loc="lower right")
     fig.tight_layout()
     fig.savefig(REPORT_FIG_DIR / "per_class_ap.pdf")
-    fig.savefig(REPORT_FIG_DIR / "per_class_ap.png", dpi=220)
     plt.close(fig)
 
 
@@ -221,22 +213,18 @@ def make_case_study_figure() -> dict[str, object]:
         image = _plot_case_column(axes[:, col], file_id, title, y[mask], scores[mask], class_names)
     if image is not None:
         fig.colorbar(image, ax=axes[2, :], shrink=0.85, label="predicted probability")
-    fig.savefig(REPORT_FIG_DIR / "case_studies.png", dpi=220)
     fig.savefig(REPORT_FIG_DIR / "case_studies.pdf")
     plt.close(fig)
 
     summary = {"success": success, "failure": failure}
-    (config.ROOT / "report" / "case_study_summary.json").write_text(json.dumps(summary, indent=2))
     return summary
 
 
 def main() -> None:
-    copy_existing_figures()
     make_split_figure()
     make_hyperparameter_figure()
     make_per_class_ap_figure()
-    summary = make_case_study_figure()
-    print(json.dumps(summary, indent=2))
+    make_case_study_figure()
 
 
 if __name__ == "__main__":

@@ -1,3 +1,10 @@
+"""Build a validation-selected ensemble from saved MLP checkpoints.
+
+This is intentionally simple: score available checkpoints, average probability
+outputs, and keep the ensemble only if validation macro AP improves over the best
+single MLP.  The final report uses the resulting predictions.
+"""
+
 from __future__ import annotations
 
 import json

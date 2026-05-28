@@ -1,57 +1,43 @@
 # MLPC 2026 Task 4: Data Classification
 
-This repository contains a reproducible segment-level classification pipeline for the
-MLPC 2026 KIAL sound event detection dataset. It builds collector-disjoint splits,
-aggregates annotator labels, trains a baseline, logistic regression models, and a
-small MLP, then writes comparison tables and figures for the report.
+This repository contains the code, report, slides, and tracked result summaries for
+the MLPC 2026 Task 4 sound event classification assignment.
 
-## Repository Layout
+## Contents
 
-```text
-src/                 Data preparation, training, metrics, and evaluation code
-tests/               Unit tests for data handling, splits, metrics, and training
-results/             Small tracked summaries and generated report tables
-results/figures/     Report figures
-resources/           Report template files
-report/              Report workspace
-slides/              Slide workspace
-```
+- `src/` - data preparation, splits, preprocessing, training, evaluation, and report figures
+- `tests/` - unit tests for the core data and model utilities
+- `results/` - tracked CSV/JSON summaries used in the report
+- `report/` - LaTeX report source and figures
+- `slides/` - Beamer slide source and figures
+- `resources/` - report and slide templates used for the submission
 
-The course dataset and large generated artifacts are intentionally not tracked.
+The course dataset, model checkpoints, logs, and large caches are intentionally
+ignored by Git.
 
-## Setup
+## Results
 
-Use Python 3.11 or newer.
+Final held-out test performance:
+
+| Model | Macro AP | Micro AP |
+| --- | ---: | ---: |
+| Class prior baseline | 0.0636 | 0.1207 |
+| Logistic regression | 0.5287 | 0.6637 |
+| MLP ensemble | 0.6381 | 0.7544 |
+
+The final report is `report/main.tex`. The slide deck is `slides/slides.tex`.
+Both expect the course/NeurIPS style file `neurips_2023.sty` to be available in
+the Overleaf project.
+
+## Reproducing the Pipeline
+
+Use Python 3.11 or newer and install the requirements:
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-On Windows PowerShell:
-
-```powershell
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
-py -m pip install --upgrade pip
-py -m pip install -r requirements.txt
-```
-
-For NVIDIA GPU acceleration on Windows, install a CUDA-enabled PyTorch build in the
-same environment:
-
-```powershell
-py -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
-```
-
-If that build is not compatible with the local driver, use the PyTorch install selector
-and install the CUDA build it recommends.
-
-## Data
-
-Place the dataset under `data/`:
+Place the course dataset under:
 
 ```text
 data/
@@ -62,11 +48,7 @@ data/
     ...
 ```
 
-The `data/` directory is ignored because the dataset is course-provided material.
-
-## Pipeline
-
-Run the full preparation and evaluation pipeline from the repository root:
+Run the standard pipeline from the repository root:
 
 ```bash
 python -m src.data
@@ -78,28 +60,10 @@ python -m src.train_mlp
 python -m src.final_eval
 ```
 
-The main outputs are:
-
-```text
-results/class_distribution.csv
-results/baseline.json
-results/lr_sweep.csv
-results/mlp_sweep.csv
-results/predictions_test.npz
-results/final_table.csv
-```
-
-Large cache and model files are ignored by git.
-
-## Faster Windows Runs
-
-The default sweeps are intentionally broad. For a faster CPU/GPU run:
-
-```powershell
-py -c "from src.train_lr import sweep_lr, plot_lr_sweep; sweep_lr(grid={'C':[0.1,1.0,10.0], 'penalty':['l2'], 'class_weight':[None,'balanced']}, max_iter=500); plot_lr_sweep()"
-py -c "from src.train_mlp import sweep_mlp; sweep_mlp(grid={'hidden_dims': [[128], [256], [256, 256]], 'dropout': [0.0], 'lr': [0.001]}, epochs=10, batch_size=2048, patience=3)"
-py -m src.final_eval
-```
+The additional scripts `src.refine_lr_torch`, `src.refine_mlp`, and
+`src.ensemble_mlp` reproduce the stronger CUDA runs and ensemble selection used
+for the submitted results. `src.report_assets` regenerates the figures in the
+report.
 
 ## Validation
 

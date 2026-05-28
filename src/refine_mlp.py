@@ -1,3 +1,10 @@
+"""Focused MLP refinement sweep used after the broad baseline sweep.
+
+The broad, reusable MLP trainer lives in ``train_mlp.py``.  This module keeps the
+small hand-selected refinement grid that was run for the submitted Task 4
+results and promotes a candidate only when validation macro AP improves.
+"""
+
 from __future__ import annotations
 
 import shutil
@@ -10,10 +17,9 @@ import pandas as pd
 
 from . import config
 from .final_eval import run_final_evaluation
-from .metrics import macro_ap, micro_ap, per_class_ap
+from .metrics import per_class_ap
 from .train_lr import load_preprocessed
 from .train_mlp import predict_proba, train_one
-
 
 CANDIDATES: list[dict[str, Any]] = [
     {"hidden_dims": [1024, 512], "dropout": 0.40, "lr": 1.0e-3, "seed": 42, "epochs": 45},

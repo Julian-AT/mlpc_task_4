@@ -1,3 +1,11 @@
+"""Focused CUDA logistic-regression sweep used for the final report.
+
+The standard sklearn one-vs-rest model is kept in ``train_lr.py``.  This module
+is an optional experiment runner: it trains a linear sigmoid head with PyTorch so
+the same temporal-context features and class-weighted BCE setup can be compared
+against the MLP under the report's macro-AP selection criterion.
+"""
+
 from __future__ import annotations
 
 import shutil

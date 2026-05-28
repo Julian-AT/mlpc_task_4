@@ -21,6 +21,15 @@ except ModuleNotFoundError:
 
 HAS_MLX = mx is not None and nn is not None and optim is not None
 
+try:
+    import torch
+    import torch.nn as torch_nn
+except ModuleNotFoundError:
+    torch = None
+    torch_nn = None
+
+HAS_TORCH_CUDA = torch is not None and torch_nn is not None and torch.cuda.is_available()
+
 from . import config
 from .metrics import macro_ap, micro_ap, per_class_ap
 from .train_lr import load_preprocessed
@@ -79,6 +88,28 @@ else:
             np.savez_compressed(path, **arrays)
 
 
+if torch_nn is not None:
+
+    class TorchMLP(torch_nn.Module):
+        def __init__(self, in_dim: int, hidden_dims: Iterable[int], out_dim: int, dropout: float = 0.2):
+            super().__init__()
+            dims = [int(in_dim), *[int(dim) for dim in hidden_dims]]
+            layers: list[torch_nn.Module] = []
+            for left, right in zip(dims[:-1], dims[1:], strict=True):
+                layers.append(torch_nn.Linear(left, right))
+                layers.append(torch_nn.ReLU())
+                if dropout > 0:
+                    layers.append(torch_nn.Dropout(dropout))
+            layers.append(torch_nn.Linear(dims[-1], int(out_dim)))
+            self.net = torch_nn.Sequential(*layers)
+
+        def forward(self, x: Any) -> Any:
+            return self.net(x)
+
+else:
+    TorchMLP = None
+
+
 def positive_class_weights(labels: np.ndarray, max_weight: float = 20.0) -> np.ndarray:
     y = np.asarray(labels, dtype=np.float32)
     positives = y.sum(axis=0)
@@ -120,6 +151,17 @@ def predict_proba(model: Any, features: np.ndarray, batch_size: int = 4096) -> n
         model.eval()
     if isinstance(model, MLPClassifier):
         return _normalize_sklearn_scores(model.predict_proba(features))
+    if HAS_TORCH_CUDA and TorchMLP is not None and isinstance(model, TorchMLP):
+        model.eval()
+        device = next(model.parameters()).device
+        x = np.asarray(features, dtype=np.float32)
+        chunks: list[np.ndarray] = []
+        with torch.no_grad():
+            for start in range(0, len(x), batch_size):
+                xb = torch.from_numpy(x[start : start + batch_size]).to(device)
+                scores = torch.sigmoid(model(xb)).detach().cpu().numpy().astype(np.float32)
+                chunks.append(scores)
+        return np.concatenate(chunks, axis=0) if chunks else np.empty((0, 0), dtype=np.float32)
 
     x = np.asarray(features, dtype=np.float32)
     chunks: list[np.ndarray] = []
@@ -208,6 +250,85 @@ def _train_one_mlx(
     return model, scores, metrics
 
 
+def _train_one_torch(
+    x_train: np.ndarray,
+    y_train: np.ndarray,
+    x_val: np.ndarray,
+    y_val: np.ndarray,
+    hidden_dims: Iterable[int],
+    dropout: float,
+    lr: float,
+    epochs: int = config.MLP_EPOCHS,
+    batch_size: int = config.MLP_BATCH,
+    patience: int = config.MLP_PATIENCE,
+    seed: int = config.SEED,
+    model_path: Path | str | None = None,
+) -> tuple[Any, np.ndarray, dict[str, Any]]:
+    if not HAS_TORCH_CUDA or TorchMLP is None:
+        raise RuntimeError("PyTorch CUDA backend requested but CUDA is unavailable")
+
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    device = torch.device("cuda")
+    x_train = np.asarray(x_train, dtype=np.float32)
+    y_train = np.asarray(y_train, dtype=np.float32)
+    x_val = np.asarray(x_val, dtype=np.float32)
+    y_val_uint = np.asarray(y_val, dtype=np.uint8)
+
+    model = TorchMLP(x_train.shape[1], hidden_dims, y_train.shape[1], dropout=dropout).to(device)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=float(lr), weight_decay=1e-4)
+    pos_weight = torch.from_numpy(positive_class_weights(y_train)).to(device)
+    criterion = torch_nn.BCEWithLogitsLoss(pos_weight=pos_weight)
+
+    history: list[dict[str, float]] = []
+    best_macro = -np.inf
+    best_scores: np.ndarray | None = None
+    best_state: dict[str, Any] | None = None
+    bad_epochs = 0
+    start_time = time.time()
+
+    for epoch in range(int(epochs)):
+        model.train()
+        losses: list[float] = []
+        for indices in _batch_indices(len(x_train), int(batch_size), seed + epoch):
+            xb = torch.from_numpy(x_train[indices]).to(device)
+            yb = torch.from_numpy(y_train[indices]).to(device)
+            optimizer.zero_grad(set_to_none=True)
+            loss = criterion(model(xb), yb)
+            loss.backward()
+            optimizer.step()
+            losses.append(float(loss.detach().cpu()))
+
+        val_scores = predict_proba(model, x_val, batch_size=max(int(batch_size), 4096))
+        val_macro = macro_ap(y_val_uint, val_scores)
+        history.append({"epoch": float(epoch + 1), "loss": float(np.mean(losses)), "val_macro_ap": val_macro})
+
+        if val_macro > best_macro:
+            best_macro = val_macro
+            best_scores = val_scores
+            best_state = {key: value.detach().cpu().clone() for key, value in model.state_dict().items()}
+            bad_epochs = 0
+            if model_path is not None:
+                save_torch_model(model, Path(model_path), hidden_dims, dropout)
+        else:
+            bad_epochs += 1
+            if bad_epochs >= patience:
+                break
+
+    if best_state is not None:
+        model.load_state_dict(best_state)
+
+    scores = best_scores if best_scores is not None else predict_proba(model, x_val)
+    metrics = {
+        "macro_ap": macro_ap(y_val_uint, scores),
+        "micro_ap": micro_ap(y_val_uint, scores),
+        "runtime_s": time.time() - start_time,
+        "epochs": len(history),
+        "history": history,
+    }
+    return model, scores, metrics
+
+
 def _train_one_sklearn(
     x_train: np.ndarray,
     y_train: np.ndarray,
@@ -271,7 +392,12 @@ def train_one(
     seed: int = config.SEED,
     model_path: Path | str | None = None,
 ) -> tuple[Any, np.ndarray, dict[str, Any]]:
-    trainer = _train_one_mlx if HAS_MLX else _train_one_sklearn
+    if HAS_MLX:
+        trainer = _train_one_mlx
+    elif HAS_TORCH_CUDA:
+        trainer = _train_one_torch
+    else:
+        trainer = _train_one_sklearn
     return trainer(
         x_train,
         y_train,
@@ -301,13 +427,30 @@ def iter_grid(grid: dict[str, Iterable[Any]] | None = None) -> list[dict[str, An
 def default_model_path() -> Path:
     if HAS_MLX:
         return config.MLP_BEST_MODEL
+    if HAS_TORCH_CUDA:
+        return config.RESULTS_DIR / "mlp_best_torch_cuda.pt"
     return config.RESULTS_DIR / "mlp_best_sklearn.joblib"
+
+
+def save_torch_model(model: Any, path: Path, hidden_dims: Iterable[int], dropout: float) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    torch.save(
+        {
+            "state_dict": model.state_dict(),
+            "hidden_dims": list(hidden_dims),
+            "dropout": float(dropout),
+            "backend": "torch_cuda",
+        },
+        path,
+    )
 
 
 def save_model(model: Any, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     if HAS_MLX and isinstance(model, MLP):
         model.save_weights(str(path))
+    elif HAS_TORCH_CUDA and TorchMLP is not None and isinstance(model, TorchMLP):
+        torch.save({"state_dict": model.state_dict(), "backend": "torch_cuda"}, path)
     else:
         joblib.dump(model, path)
 

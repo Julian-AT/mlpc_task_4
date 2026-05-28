@@ -1,6 +1,7 @@
+import joblib
 import numpy as np
 
-from src.train_mlp import MLP, positive_class_weights, predict_proba, sweep_mlp, train_one
+from src.train_mlp import MLP, _train_one_sklearn, positive_class_weights, predict_proba, sweep_mlp, train_one
 
 
 def _synthetic_mlp_data():
@@ -112,3 +113,28 @@ def test_sweep_mlp_writes_csv_weights_and_predictions(tmp_path):
     assert len(frame) == 1
     loaded = np.load(predictions_path, allow_pickle=True)
     assert loaded["mlp_test_scores"].shape == (2, 2)
+
+
+def test_sklearn_fallback_trains_and_writes_joblib(tmp_path):
+    data = _synthetic_mlp_data()
+    model_path = tmp_path / "mlp_best_sklearn.joblib"
+
+    model, scores, metrics = _train_one_sklearn(
+        data["features_context"][data["train_idx"]],
+        data["labels"][data["train_idx"]],
+        data["features_context"][data["val_idx"]],
+        data["labels"][data["val_idx"]],
+        hidden_dims=[4],
+        dropout=0.0,
+        lr=1e-2,
+        epochs=2,
+        batch_size=4,
+        patience=2,
+        model_path=model_path,
+    )
+
+    assert model_path.exists()
+    assert joblib.load(model_path) is not None
+    assert scores.shape == (2, 2)
+    assert metrics["epochs"] >= 1
+    assert model is not None

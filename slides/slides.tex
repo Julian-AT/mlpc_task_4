@@ -1,15 +1,26 @@
-\documentclass[aspectratio=169]{beamer}
+% !TeX program = xelatex
+% !TeX encoding = UTF-8
+% !TeX spellcheck = en_US
+%%
+%% MLPC 2026 Task 4 -- Case Study and Reflection
+%% Restyled with the official JKU LaTeX Beamer theme
+%%   (https://github.com/michaelroland/jku-templates-presentation-latex)
+%%
+%% BUILD: compile with XeLaTeX (or LuaLaTeX) so the JKU corporate fonts load.
+%%   The theme files (beamerthemejku.sty, beamercolorthemejku.sty,
+%%   beamerfontthemejku.sty) and the fonts/ and logos/ folders from the theme
+%%   repository must sit alongside this file.
+%%
 
-\usetheme{Madrid}
-\usecolortheme{default}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+\documentclass[aspectratio=169,english]{beamer}
+
+%% Official JKU theme, light/white colour mode, JKU corporate fonts on.
+\usepackage[final]{inconsolata}
+
 \usepackage{booktabs}
 \usepackage{graphicx}
 
-\setbeamertemplate{navigation symbols}{}
-\setbeamertemplate{footline}[frame number]
-
+%% --- Presentation information (kept exactly: our team and authors) ---
 \title{MLPC 2026 Task 4: Case Study and Reflection}
 \subtitle{Classification Results on Held-Out Domestic Sound Events}
 \author{Team A-C (Qualitative) \\ Julian Schmidt, Paul Breburda}
@@ -17,32 +28,30 @@
 
 \begin{document}
 
-\begin{frame}
-  \titlepage
-\end{frame}
-
-%% Slide 1: Final classifier context
+%% ---------------------------------------------------------------------------
+%% Slide: Final model and evaluation setup
+%% (hyperparameter-sweep bar chart removed; the table carries the comparison)
+%% ---------------------------------------------------------------------------
 \begin{frame}{Final Model and Evaluation Setup}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{Setup:}
+  \begin{columns}[c]
+    \begin{column}{0.56\textwidth}
+      \textbf{Setup}
       \begin{itemize}
         \item Collector-disjoint train/validation/test split
         \item Majority-vote segment labels from $[T,C,A]$ annotations
         \item Macro average precision used for model selection
         \item Final model: validation-selected MLP probability ensemble
       \end{itemize}
-      \vspace{0.4em}
-      \textbf{Why macro AP:}
+      \vspace{0.6em}
+      \textbf{Why macro AP}
       \begin{itemize}
         \item Threshold-free for multi-label sigmoid outputs
         \item Gives rare classes equal weight
         \item Avoids hiding \texttt{light\_switch}/\texttt{bell} errors behind common classes
       \end{itemize}
     \end{column}
-    \begin{column}{0.42\textwidth}
+    \begin{column}{0.40\textwidth}
       \centering
-      \small
       \begin{tabular}{lcc}
         \toprule
         Model & Macro AP & Micro AP \\
@@ -52,41 +61,45 @@
         MLP ensemble & \textbf{0.638} & \textbf{0.754} \\
         \bottomrule
       \end{tabular}
-      \vspace{0.8em}
+      \vspace{0.6em}
 
-      \includegraphics[width=0.98\linewidth]{figures/hyperparameter_summary.pdf}
+      {\footnotesize Held-out test set; macro / micro average precision.}
     \end{column}
   \end{columns}
 \end{frame}
 
-%% Slide 2: Qualitative cases
+%% ---------------------------------------------------------------------------
+%% Slide: Qualitative case studies
+%% (bullets compacted to two columns on top; figure gets the full lower half)
+%% ---------------------------------------------------------------------------
 \begin{frame}{Qualitative Case Studies}
   \begin{columns}[T]
-    \begin{column}{0.39\textwidth}
+    \begin{column}{0.49\textwidth}
       \textbf{Success: file 000727}
       \begin{itemize}
-        \item Kitchen: microwave, water, dishes
-        \item Static phone recording
+        \item Kitchen (microwave, water, dishes); static phone
         \item File-level F1: \textbf{0.978}
-        \item Sustained events align with mel-spectrogram energy
+        \item Sustained events track mel-spectrogram energy
       \end{itemize}
-      \vspace{0.6em}
+    \end{column}
+    \begin{column}{0.49\textwidth}
       \textbf{Failure: file 000892}
       \begin{itemize}
-        \item Hallway: door, footsteps, light switch
-        \item Mobile phone recording
+        \item Hallway (door, footsteps, light switch); mobile phone
         \item File-level F1: \textbf{0.000}
         \item Short transients shifted or confused
       \end{itemize}
     \end{column}
-    \begin{column}{0.58\textwidth}
-      \centering
-      \includegraphics[width=\linewidth]{figures/case_studies.pdf}
-    \end{column}
   \end{columns}
+  \vspace{0.4em}
+  \begin{center}
+    \includegraphics[width=0.98\linewidth,height=0.46\textheight,keepaspectratio]{figures/case_studies.pdf}
+  \end{center}
 \end{frame}
 
-%% Slide 3: Class-level strengths and weaknesses
+%% ---------------------------------------------------------------------------
+%% Slide: Class-level strengths (per-class AP figure kept)
+%% ---------------------------------------------------------------------------
 \begin{frame}{What the Classifier Detects Reliably}
   \begin{columns}[T]
     \begin{column}{0.43\textwidth}
@@ -112,7 +125,9 @@
   \end{columns}
 \end{frame}
 
-%% Slide 4: Failure modes and next steps
+%% ---------------------------------------------------------------------------
+%% Slide: Failure modes and next steps
+%% ---------------------------------------------------------------------------
 \begin{frame}{Failure Modes and Next Steps}
   \begin{enumerate}
     \item \textbf{Short transients:}

@@ -1,0 +1,14 @@
+{
+  "macro_ap": 0.617816150188446,
+  "micro_ap": 0.7172471440304844,
+  "members": [
+    "C:\\Development\\Private\\mlpc_task_4\\results\\mlp_refine_candidates\\mlp_01_512-256_d0.45_lr0.001_s42.pt",
+    "C:\\Development\\Private\\mlpc_task_4\\results\\mlp_refine_candidates\\mlp_02_1024-512_d0.35_lr0.001_s42.pt",
+    "C:\\Development\\Private\\mlpc_task_4\\results\\mlp_refine_candidates\\mlp_08_512-256_d0.45_lr0.001_s123.pt",
+    "C:\\Development\\Private\\mlpc_task_4\\results\\mlp_refine_candidates\\mlp_09_1024-512_d0.4_lr0.001_s7.pt",
+    "C:\\Development\\Private\\mlpc_task_4\\results\\mlp_refine_candidates\\mlp_05_512-256_d0.45_lr0.0013_s42.pt",
+    "C:\\Development\\Private\\mlpc_task_4\\results\\mlp_refine_candidates\\mlp_09_768-384_d0.45_lr0.001_s42.pt",
+    "C:\\Development\\Private\\mlpc_task_4\\results\\mlp_refine_candidates\\mlp_11_1536-768_d0.4_lr0.001_s42.pt",
+    "C:\\Development\\Private\\mlpc_task_4\\results\\mlp_refine_candidates\\mlp_03_1024-512_d0.45_lr0.001_s42.pt"
+  ]
+}

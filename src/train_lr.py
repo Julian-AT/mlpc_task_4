@@ -11,6 +11,7 @@ import joblib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from joblib import parallel_backend
 from sklearn.linear_model import LogisticRegression
 from sklearn.multiclass import OneVsRestClassifier
 
@@ -40,6 +41,8 @@ def fit_one(
     penalty: str,
     class_weight: str | None,
     max_iter: int = 2000,
+    n_jobs: int = 1,
+    parallel_backend_name: str | None = None,
 ) -> tuple[OneVsRestClassifier, np.ndarray, dict[str, float]]:
     solver = "liblinear" if penalty == "l1" else "lbfgs"
     base = LogisticRegression(
@@ -49,7 +52,7 @@ def fit_one(
         solver=solver,
         max_iter=max_iter,
     )
-    model = OneVsRestClassifier(base, n_jobs=-1)
+    model = OneVsRestClassifier(base, n_jobs=n_jobs)
     start = time.time()
     with warnings.catch_warnings():
         warnings.filterwarnings(
@@ -58,7 +61,11 @@ def fit_one(
         warnings.filterwarnings(
             "ignore", message="Inconsistent values: penalty=.*", category=UserWarning
         )
-        model.fit(x_train, y_train)
+        if parallel_backend_name is None:
+            model.fit(x_train, y_train)
+        else:
+            with parallel_backend(parallel_backend_name):
+                model.fit(x_train, y_train)
     val_scores = _predict_proba(model, x_val)
     runtime = time.time() - start
     return (
@@ -109,6 +116,8 @@ def sweep_lr(
     model_path: Path | str | None = None,
     predictions_path: Path | str | None = None,
     max_iter: int = 2000,
+    n_jobs: int = 1,
+    parallel_backend_name: str | None = None,
 ) -> pd.DataFrame:
     dataset = data if data is not None else load_preprocessed()
     x = np.asarray(dataset.get("features_scaled", dataset.get("features")), dtype=np.float32)
@@ -139,6 +148,8 @@ def sweep_lr(
             penalty=params["penalty"],
             class_weight=params["class_weight"],
             max_iter=max_iter,
+            n_jobs=n_jobs,
+            parallel_backend_name=parallel_backend_name,
         )
         rows.append(_row(params, metrics, y[val_idx], val_scores, class_names))
         if metrics["macro_ap"] > best_score:

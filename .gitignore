@@ -27,7 +27,14 @@ resources_codex/
 results/*.npz
 results/*.pkl
 results/*.joblib
+results/*.pt
+results/*.log
+results/*.err
+results/*_candidates/
+results/pytest_tmp_codex/
 *.pdf
+!report/figures/*.pdf
+!slides/figures/*.pdf
 
 # Notebooks are scratch by convention
 notebooks/*.ipynb

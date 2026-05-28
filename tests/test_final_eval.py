@@ -39,7 +39,7 @@ def test_build_final_table_compares_baseline_lr_and_mlp(tmp_path):
     table = build_final_table(baseline_path, predictions_path, output_path)
 
     assert output_path.exists()
-    assert table["model"].tolist() == ["class_prior", "logistic_regression", "mlx_mlp"]
+    assert table["model"].tolist() == ["class_prior", "logistic_regression", "mlp"]
     assert "ap_a" in table.columns
 
 

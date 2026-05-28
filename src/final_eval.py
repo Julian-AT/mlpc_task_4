@@ -56,7 +56,7 @@ def build_final_table(
                 _metric_row("logistic_regression", y_test, loaded["lr_test_scores"], class_names)
             )
         if "mlp_test_scores" in loaded.files:
-            rows.append(_metric_row("mlx_mlp", y_test, loaded["mlp_test_scores"], class_names))
+            rows.append(_metric_row("mlp", y_test, loaded["mlp_test_scores"], class_names))
 
     frame = pd.DataFrame(rows)
     output.parent.mkdir(parents=True, exist_ok=True)

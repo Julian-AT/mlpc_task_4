@@ -1,0 +1,115 @@
+\documentclass[aspectratio=169]{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{default}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{booktabs}
+\usepackage{graphicx}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+
+\title{MLPC 2026 Task 3: Qualitative Analysis}
+\subtitle{Annotation Verification and Disagreement Analysis}
+\author{Team A-C (Qualitative) \\ Julian Schmidt, Paul Breburda}
+\date{April 2026}
+% Interactive version: see slides-interactive/ (run with npm run dev)
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+%% Slide 1: Verification Process and Agreement Overview
+\begin{frame}{Annotation Verification Process}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      \textbf{Procedure:}
+      \begin{itemize}
+        \item Verified 5 assigned recordings per team member via Label Studio
+        \item Compared annotations side-by-side across annotators
+        \item Accepted, fixed, or rejected each recording
+      \end{itemize}
+      \vspace{0.5em}
+      \textbf{Key Finding:}
+      \begin{itemize}
+        \item Inter-annotator agreement ranged from \textbf{24.1\%} to \textbf{93.0\%}
+        \item Agreement correlates inversely with recording complexity
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+      \centering
+      \small
+      \begin{tabular}{lc}
+        \toprule
+        Metric & Value \\
+        \midrule
+        Files verified & 5 \\
+        Min agreement & 24.1\% \\
+        Max agreement & 93.0\% \\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+%% Slide 2: Four Sources of Disagreement
+\begin{frame}{Sources of Annotation Disagreement}
+  \begin{enumerate}
+    \item \textbf{Systematic Omission:} Individual annotators missed $>$50\% of events in some recordings; introduces false negatives and biases classifiers toward high precision / low recall
+
+    \vspace{0.3em}
+    \item \textbf{Acoustic Confusion:} Similar-sounding classes confused:
+    \texttt{bell\_ringing} $\leftrightarrow$ \texttt{phone\_ringing},
+    \texttt{door} $\leftrightarrow$ \texttt{wardrobe\_drawer}
+
+    \vspace{0.3em}
+    \item \textbf{Boundary Disagreement:} Divergent segmentation of pauses $>$1s (e.g., \texttt{microwave} beeps as one region vs. multiple); affects event-level metrics
+
+    \vspace{0.3em}
+    \item \textbf{Transient Bias:} Brief sounds (\texttt{keychain}, \texttt{light\_switch}) disproportionately missed vs. sustained sounds (\texttt{vacuum\_cleaner}, \texttt{running\_water})
+  \end{enumerate}
+\end{frame}
+
+%% Slide 3: Case Study
+\begin{frame}{Case Study: Lowest Agreement Recording (24.1\%)}
+  \begin{columns}[T]
+    \begin{column}{0.45\textwidth}
+      \textbf{Recording:} 23s polyphonic domestic audio
+      \vspace{0.5em}
+
+      \centering
+      \begin{tabular}{lcc}
+        \toprule
+        Class & Ann.\ A & Ann.\ B \\
+        \midrule
+        \texttt{door\_open\_close} & 0 & 2 \\
+        \texttt{footsteps} & 1 & 2 \\
+        \texttt{keyboard\_typing} & 1 & 1 \\
+        \texttt{keychain} & 0 & 1 \\
+        \midrule
+        \textbf{Total Regions} & \textbf{2} & \textbf{6} \\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \textbf{Analysis:}
+      \begin{itemize}
+        \item Annotator A detected only 33\% of events
+        \item 2 of 4 classes entirely omitted
+        \item \texttt{door} events masked by concurrent \texttt{keyboard\_typing}
+        \item Brief \texttt{keychain} missed (transient bias)
+      \end{itemize}
+      \vspace{0.5em}
+      \textbf{Implications:}
+      \begin{itemize}
+        \item Majority-vote underrepresents polyphonic segments
+        \item Need: more annotators for complex recordings, label smoothing during training
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\end{document}

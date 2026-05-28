@@ -1,0 +1,223 @@
+\documentclass{article}
+
+\usepackage[final]{neurips_2023}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{titlesec}
+\usepackage{needspace}
+
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.05}
+\titlespacing*{\section}{0pt}{2.2ex plus 0.6ex minus 0.2ex}{1.0ex plus 0.2ex}
+\titlespacing*{\subsection}{0pt}{1.4ex plus 0.4ex minus 0.1ex}{0.6ex plus 0.1ex}
+\setlength{\textfloatsep}{10pt plus 2pt minus 2pt}
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}
+\setlength{\abovecaptionskip}{5pt}
+\setlength{\belowcaptionskip}{0pt}
+\widowpenalty=10000
+\clubpenalty=10000
+\displaywidowpenalty=10000
+\raggedbottom
+
+\title{MLPC 2026 Task 3: Data Exploration Report}
+
+\author{%
+  Team A-C (Qualitative) \AND
+  Julian Schmidt
+  \And
+  Paul Breburda
+}
+
+\begin{document}
+
+\maketitle
+
+The MLPC 2026 dataset supports sound event detection (SED) for smart home environments. It comprises 3{,}656 crowd-sourced recordings (168{,}239 one-second segments) annotated for 15 domestic classes by multiple annotators per file, paired with 47 precomputed audio features in 14 groups. This report verifies annotation quality, quantifies inter-annotator agreement, defines a label aggregation, characterizes the resulting label space, summarizes the features, and identifies biases that will shape the modeling phase. 
+
+An interactive and explorable slide deck can be found at \url{http://mlpc.julianschmidt.cv/}
+
+\needspace{6\baselineskip}
+\section{Verify Annotations and Qualitative Analysis}
+
+\subsection{Annotation Verification Process}
+
+Each team member verified five assigned recordings in the Label Studio review interface, comparing all annotators side by side with the spectrogram overlay and flagging discrepancies in class labels and temporal boundaries. Three explicit acceptance criteria were applied: \emph{accept} when all events were labeled within $\pm$1\,s of the true onset/offset; \emph{fix and accept} when boundary errors exceeded 1\,s, when a class was swapped for an acoustically similar one (e.g., \texttt{phone\_ringing} for \texttt{bell\_ringing}), or when an audible event was missing; and \emph{reject} when no audible target sounds were present.
+
+\subsection{Summary of Annotation Disagreements}
+
+Inter-annotator agreement on the verified recordings ranged from 24.06\% to 92.99\%, with low values concentrated on multi-class polyphonic clips. We identified four primary failure modes:
+
+\begin{enumerate}
+\item \textbf{Systematic omission:} Annotators missed over half of all events in some recordings, biasing classifiers toward precision at the cost of recall.
+\item \textbf{Acoustic confusion:} \texttt{bell\_ringing}/\texttt{phone\_ringing} and \texttt{door\_open\_close}/\texttt{wardrobe\_drawer\_open\_close} were repeatedly swapped because the underlying physical sounds (mechanical hinges, metallic resonators) are genuinely similar.
+\item \textbf{Boundary disagreement:} Annotators disagreed on whether to merge or split events around pauses near 1\,s, producing different region counts even when class assignments matched.
+\item \textbf{Transient bias:} Brief impulsive sounds (\texttt{keychain}, \texttt{light\_switch}) were disproportionately missed compared to sustained events (\texttt{vacuum\_cleaner}, \texttt{running\_water}).
+\end{enumerate}
+
+Agreement degraded monotonically with recording complexity, dropping below 40\% for multi-class polyphonic clips and approaching 90\% for single-source ones.
+
+\subsection{Case Study: Annotation Failure Analysis}
+
+We examine the recording with the lowest agreement (24.06\%) among our verified samples. With only five recordings reviewed per team member, this case is illustrative rather than statistically representative. The clip spans 23\,s of polyphonic domestic audio and was annotated independently by exactly two reviewers; their region counts diverge sharply (Table~\ref{tab:case_study}).
+
+\begin{table}[t]
+  \centering
+  \small
+  \caption{Region counts per annotator for the lowest-agreement recording (file 002871).}
+  \label{tab:case_study}
+  \begin{tabular}{lcc}
+    \toprule
+    Class & Annotator A & Annotator B \\
+    \midrule
+    \texttt{door\_open\_close} & 0 & 2 \\
+    \texttt{footsteps} & 1 & 2 \\
+    \texttt{keyboard\_typing} & 1 & 1 \\
+    \texttt{keychain} & 0 & 1 \\
+    \midrule
+    Total Regions & 2 & 6 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Annotator A captured only 33\% of the events identified by Annotator B and omitted two classes entirely. The missed \texttt{door\_open\_close} events occurred during concurrent \texttt{keyboard\_typing}, suggesting auditory masking by the continuous foreground sound; the missing \texttt{keychain} event is a brief impulsive jingle that exemplifies the vulnerability of short transients to oversight. Under majority-vote aggregation with only two annotators, any event marked by exactly one of them is excluded entirely, systematically underrepresenting polyphonic segments. Concrete mitigations are to require at least three annotators for clips with more than two target classes and to apply label smoothing during training.
+
+\needspace{6\baselineskip}
+\section{Annotations}
+
+\subsection{Annotator Agreement}
+
+We quantify inter-annotator agreement using a segment-level Intersection over Union (IoU). For every file with at least two annotators we binarize the $[T,C,A]$ overlap array at $0.5$ and compute pairwise IoU per class across all annotator pairs, masking the score when the union is empty. Of the 3{,}656 recordings, 3{,}031 have two or more annotators.
+
+Table~\ref{tab:agreement} reports per-class mean IoU. The overall mean of 0.640 indicates moderate agreement. \texttt{vacuum\_cleaner} (0.870) and \texttt{running\_water} (0.821) score highest, consistent with their sustained, broadband character. \texttt{light\_switch} reaches only 0.179, reflecting its short duration and the difficulty of locating brief transients. \texttt{wardrobe\_drawer\_open\_close} (0.445) and \texttt{door\_open\_close} (0.467) suffer from both the mechanical-hinge confusion and perceptually fuzzy boundaries.
+
+Splitting pairs by whether either member is the recording collector, ``own'' pairs ($n=4{,}169$) achieve mean IoU $0.705$ vs.\ $0.685$ for external pairs ($n=1{,}564$). The $0.020$ difference has a bootstrap 95\% CI of $[0.006, 0.033]$ ($10^4$ resamples) and a two-sided permutation $p = 0.002$, so scene familiarity yields a small but statistically significant boost.
+
+\begin{table}[t]
+  \centering
+  \caption{Per-class segment-level IoU agreement across all annotator pairs, plus overall and own-vs-other comparisons.}
+  \label{tab:agreement}
+  \begin{tabular}{lclc}
+    \toprule
+    Class & IoU & Class & IoU \\
+    \midrule
+    \texttt{vacuum\_cleaner} & 0.870 & \texttt{footsteps} & 0.551 \\
+    \texttt{running\_water} & 0.821 & \texttt{window\_open\_close} & 0.559 \\
+    \texttt{keyboard\_typing} & 0.810 & \texttt{door\_open\_close} & 0.467 \\
+    \texttt{coffee\_machine} & 0.772 & \texttt{wardrobe\_drawer} & 0.445 \\
+    \texttt{microwave} & 0.763 & \texttt{light\_switch} & 0.179 \\
+    \texttt{toilet\_flushing} & 0.727 & & \\
+    \texttt{phone\_ringing} & 0.719 & \textbf{Overall} & \textbf{0.640} \\
+    \texttt{bell\_ringing} & 0.682 & Own pairs & 0.705 \\
+    \texttt{keychain} & 0.644 & Other pairs & 0.685 \\
+    \texttt{cutlery\_dishes} & 0.592 & & \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Converting Annotations to Labels}
+
+We aggregate the $[T, C, A]$ overlap array (segments $\times$ classes $\times$ annotators) into binary targets via per-annotator binarization followed by majority voting: $y_{t,c} = \mathbf{1}\!\left[\frac{1}{A}\sum_{a=1}^{A}\mathbf{1}[\text{ann}_{t,c,a}\!\geq\!0.5]\geq 0.5\right]$, where $\mathbf{1}[\cdot]$ is the indicator function. The 0.5 binarization threshold marks a segment positive when at least half its duration overlaps an annotation; sweeping it over $\{0.4, 0.5, 0.6\}$ shifts overall IoU by only $\{+0.013, 0, -0.014\}$, confirming stability. The 17\% of files with a single annotator use that annotator's binarized labels directly, inflating their relative trust, a caveat for downstream training. The conservative majority scheme prioritizes precision: a union strategy would recover the lost polyphonic events but also propagate single-annotator false positives into the training labels, biasing the resulting classifier toward predicting absent events.
+
+\subsection{Label Characteristics}
+
+Figure~\ref{fig:labels} shows class frequencies and pairwise co-occurrence after aggregation. The dataset is heavily imbalanced: \texttt{footsteps} dominates with 25{,}685 positive segments (15.3\%), while \texttt{light\_switch} accounts for only 1{,}047 (0.6\%), a 24:1 ratio. Sustained sounds (\texttt{running\_water}, \texttt{keyboard\_typing}, \texttt{vacuum\_cleaner}) are over-represented because each event spans many segments, whereas transients contribute only a few. \texttt{footsteps} co-occurs with almost every other class, and \texttt{cutlery\_dishes}/\texttt{running\_water} co-occur frequently, consistent with shared kitchen activity. These dependencies rule out a softmax classifier; per-class sigmoid heads are required for multi-label output.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.95\linewidth]{figures/labels_combined.pdf}
+  \caption{(a) Class frequency after majority-vote aggregation. (b) Conditional co-occurrence $P(\text{col} \mid \text{row})$; the diagonal is masked since $P(c \mid c) = 1$ trivially.}
+  \label{fig:labels}
+\end{figure}
+
+\needspace{6\baselineskip}
+\section{Audio Features}
+
+\subsection{Metadata Distribution}
+
+Figure~\ref{fig:metadata} summarizes recording metadata. The 3{,}656 recordings, captured on 369 distinct devices and dominated by Apple iPhones (iPhone 15, 13, 15 Pro), have median duration $22.5$\,s (IQR $[18.5, 27.5]$\,s, range $[12, 39.5]$\,s), corresponding to 168{,}239 one-second segments. Device placement is roughly balanced (static 53.9\%, mobile 46.1\%). Kitchens are the most frequent environment (26.3\%), followed by bedrooms (16.0\%) and living rooms (11.6\%), with bathrooms, hallways, and offices in the long tail. This skew biases the dataset toward kitchen-associated classes.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.95\linewidth]{figures/metadata_distribution.pdf}
+  \caption{Distribution of recording devices (top 10 + other), device placement, and recording environments.}
+  \label{fig:metadata}
+\end{figure}
+
+\subsection{Feature Statistics}
+
+Table~\ref{tab:features} reports summary statistics for nine selected feature groups (mean temporal aggregation); $\Delta$-MFCC, $\Delta\Delta$-MFCC, spectral contrast, and low/high rolloff are omitted for compactness and appear only in the correlation matrix (Fig.~\ref{fig:features}a). Features span vastly different scales: centroid extends up to $5{,}789$\,Hz while flatness and ZCR are bounded in $[0,1]$. Power exhibits the largest dynamic range (max $11{,}140$), signaling high-energy transients (door slams, dish drops). MFCCs are centered near $-2.04$ with low spread. These scale differences make per-feature z-scoring essential before training linear or distance-based classifiers.
+
+\begin{table}[t]
+  \centering
+  \small
+  \caption{Summary statistics of selected feature groups (mean aggregation) over all 168{,}239 segments.}
+  \label{tab:features}
+  \begin{tabular}{lrrrr}
+    \toprule
+    Feature & Mean & Std & Min & Max \\
+    \midrule
+    ZCR & 0.191 & 0.133 & 0.000 & 0.813 \\
+    Energy & 31.68 & 46.23 & 0.00 & 615.9 \\
+    Power & 63.39 & 204.1 & 0.00 & 11140 \\
+    Flux & 1.953 & 2.550 & 0.000 & 49.97 \\
+    Flatness & 0.088 & 0.087 & 0.000 & 1.000 \\
+    Centroid (Hz) & 2207 & 884.2 & 0.0 & 5789 \\
+    Bandwidth (Hz) & 2785 & 518.9 & 0.0 & 4360 \\
+    MFCC & $-$2.04 & 0.489 & $-$4.07 & $-$0.19 \\
+    Mel Spect. & 4.517 & 1.525 & 0.000 & 8.887 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Feature Correlation}
+
+Figure~\ref{fig:features}a shows the Pearson correlation matrix between feature groups. ZCR, centroid, bandwidth, and high rolloff form a strongly correlated cluster ($r > 0.6$), all capturing spectral shape and brightness. Energy and flux are correlated at $r = 0.93$, both reflecting amplitude dynamics. MFCCs and the mel spectrogram are correlated at $r = 0.82$, expected since MFCCs are a DCT of the log mel spectrogram. $\Delta$-MFCC and $\Delta\Delta$-MFCC show near-zero correlation with all other features, confirming their role as independent temporal-dynamics descriptors. The 47-dimensional feature set is therefore highly redundant: PCA or a learned linear projection should compress it substantially without loss.
+
+\subsection{Feature Space Visualization}
+
+We apply t-SNE to 10{,}000 high-agreement single-class segments using the 47-dimensional mean-aggregated feature vector (Fig.~\ref{fig:features}b). Acoustically distinct sustained classes (\texttt{vacuum\_cleaner}, \texttt{running\_water}) form well-separated clusters, while transients (\texttt{keychain}, \texttt{light\_switch}) overlap with each other and with background, identifying them as the hardest classification targets and as candidates for temporal-attention models rather than per-segment classification.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.95\linewidth]{figures/features_combined.pdf}
+  \caption{(a) Pearson correlation matrix between feature groups (lower triangle). (b) t-SNE projection of audio features for high-agreement single-class segments, colored by class label.}
+  \label{fig:features}
+\end{figure}
+
+\needspace{6\baselineskip}
+\section{Conclusions}
+
+\subsection{Dataset Biases}
+
+Our analysis identifies four biases that any downstream training pipeline must account for. The first is a hardware bias: although 369 distinct recording devices appear in the corpus, Apple iPhones dominate the long tail, leaving Android phones, tablets, and laptops sparsely represented. Models trained on this distribution are likely to generalize poorly to the noise floors and microphone responses of unseen hardware. The second is an environmental bias: kitchens account for 26.3\% of recordings, mechanically over-representing kitchen-associated classes such as \texttt{running\_water} and \texttt{cutlery\_dishes} while leaving bathrooms, hallways, and offices in the long tail. The third is an annotator bias: own-recording pairs achieve a 0.020 IoU advantage over external pairs ($p = 0.002$), small but statistically significant, indicating that collector familiarity systematically shifts labels and that any evaluation mixing annotations will conflate scene knowledge with model accuracy. The 24:1 ratio between the most and least frequent classes will pull standard classifiers toward the majority classes unless resampling or loss reweighting is applied.
+
+\subsection{Dataset Suitability}
+
+The dataset is broadly suitable for training sound event detectors: it provides 3{,}656 diverse domestic recordings with multi-annotator labels across 15 classes and a rich precomputed feature set. Several challenges remain. We recommend addressing class imbalance with class-weighted binary cross-entropy combined with focal loss to focus learning on rare transients (\texttt{light\_switch}, \texttt{bell\_ringing}); filtering training segments to those whose class-level IoU is at least $0.6$ to reduce label noise on noisy classes while keeping the high-agreement majority; partitioning train/val/test by \texttt{collector\_id} (group-stratified split) so that recordings from the same collector and device do not leak between splits; and adopting per-class sigmoid heads for multi-label output. Acoustically similar pairs (\texttt{door}/\texttt{wardrobe}, \texttt{bell}/\texttt{phone}) will demand fine-grained feature discrimination and should benefit from time-domain or pitch-aware augmentations targeting their distinguishing cues.
+
+\subsection{Broader Impact}
+
+This enables applications including assistive systems for hearing-impaired users, elderly care monitoring (fall detection, medication reminders), and energy-efficient smart home automation. The technology can pose meaningful privacy risks: domestic audio monitoring could enable surveillance, and acoustic fingerprinting may identify individuals or activities without their consent. The dataset's domestic focus amplifies these concerns since the recorded environments are intimate spaces. Mitigations include on-device processing so raw audio never leaves the home, informed-consent protocols for all deployed systems, restricting model outputs to predefined event categories rather than open-ended audio analysis, and publishing only aggregated features rather than the source waveforms whenever possible.
+
+\needspace{4\baselineskip}
+\section{Disclosure of LLM and AI Tool Use}
+
+We used Claude Opus 4.6 1M Context for Planning, Opus 4.6 (fast) and Cursor Composer 2 (fast) for data analysis, code generation supporting the statistical computations, and editorial refinement of written sections. All quantitative claims were verified by re-running the underlying scripts and cross-checking outputs against the raw data. Figures were produced programmatically from the same scripts and inspected for consistency with the reported summary statistics.
+
+This project consumed approximately 13~million tokens of Claude Opus~4.6 across analysis, writing, and the
+interactive slide deck. The full codebase, including the LaTeX sources, Python
+analysis scripts, and the Next.js presentation app, is available at
+\url{https://github.com/julian-at/mlpc-2026-task3}.
+  
+\end{document}
